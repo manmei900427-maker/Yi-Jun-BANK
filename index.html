@@ -6,22 +6,52 @@
   <title>Yi Jun bank</title>
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #f4f5f7; color: #1f2329; margin: 0; padding: 0; }
-    .top-bar { background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e6eb; }
-    .top-title { font-size: 16px; font-weight: 700; }
+    body { background: #f4f5f7; color: #1f2329; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+    .top-bar { background: #ffffff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e6eb; position: sticky; top: 0; z-index: 20; }
+    .top-title { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
     .user-pill { font-size: 12px; background: #f4f5f7; color: #4e5969; padding: 4px 12px; border-radius: 20px; font-weight: 600; border: 1px solid #e5e6eb; }
     .container { max-width: 440px; margin: 0 auto; padding: 20px 16px 60px; }
-    .card { background: #fff; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(31,35,41,0.04); border: 1px solid #e5e6eb; margin-bottom: 16px; }
+    .card { background: #ffffff; border-radius: 20px; padding: 22px; box-shadow: 0 4px 20px rgba(31,35,41,0.04); border: 1px solid #e5e6eb; margin-bottom: 16px; }
     label { display: block; font-size: 12px; color: #4e5969; margin-bottom: 6px; font-weight: 600; }
-    input { width: 100%; padding: 12px; margin-bottom: 14px; border-radius: 10px; border: 1px solid #e5e6eb; background: #f9fafb; font-size: 14px; outline: none; }
-    .btn { width: 100%; padding: 13px; border: none; border-radius: 10px; background: #1f2329; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
-    .btn-outline { width: 100%; padding: 10px; border: 1px solid #4e5969; border-radius: 8px; background: #fff; color: #1f2329; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .tabs { display: flex; gap: 20px; border-bottom: 1px solid #e5e6eb; margin-bottom: 16px; }
-    .tab { padding: 8px 4px; font-size: 14px; font-weight: 600; color: #86909c; cursor: pointer; }
-    .tab.active { color: #1f2329; border-bottom: 3px solid #1f2329; }
+    input { width: 100%; padding: 11px 12px; margin-bottom: 12px; border-radius: 10px; border: 1px solid #e5e6eb; background: #f9fafb; font-size: 14px; outline: none; color: #1f2329; }
+    input:focus { border-color: #4e5969; background: #ffffff; }
+    .btn { width: 100%; padding: 13px; border: none; border-radius: 10px; background: #1f2329; color: #ffffff; font-size: 15px; font-weight: 600; cursor: pointer; }
+    .btn:active { opacity: 0.88; }
+    .btn:disabled { background: #e5e6eb; color: #86909c; cursor: not-allowed; }
+    .btn-outline { width: 100%; padding: 10px; border: 1px solid #4e5969; border-radius: 8px; background: #ffffff; color: #1f2329; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+    .quick-btn { background: #ffffff; border: 1px solid #e5e6eb; border-radius: 12px; padding: 12px 2px; font-size: 12px; font-weight: 600; color: #4e5969; box-shadow: 0 4px 20px rgba(31,35,41,0.04); cursor: pointer; text-align: center; }
+    .quick-btn.active { background: #1f2329; color: #ffffff; border-color: #1f2329; }
+    .tabs { display: flex; gap: 18px; border-bottom: 1px solid #e5e6eb; margin-bottom: 16px; padding: 0 4px; overflow-x: auto; }
+    .tab { padding: 8px 2px 10px; font-size: 14px; font-weight: 600; color: #86909c; cursor: pointer; position: relative; white-space: nowrap; }
+    .tab.active { color: #1f2329; }
+    .tab.active::after { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: #1f2329; border-radius: 3px; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .tx-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f4f5f7; font-size: 14px; }
+    .tx-row { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-bottom: 1px solid #f4f5f7; font-size: 14px; }
     .tx-row:last-child { border-bottom: none; }
+    .admin-sub { background: #f9fafb; border: 1px solid #e5e6eb; border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+    .admin-sub-title { font-size: 13px; font-weight: 700; color: #1f2329; margin-bottom: 10px; }
+    .reward-edit-row { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; background: #ffffff; padding: 8px; border-radius: 8px; border: 1px solid #e5e6eb; }
+    .reward-edit-row input { margin-bottom: 0; padding: 8px; font-size: 13px; }
+    .btn-del-sm { background: #ffece8; color: #cb2634; border: none; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+
+    /* 每日轉盤樣式 */
+    .wheel-wrap { position: relative; width: 210px; height: 210px; margin: 16px auto 22px; }
+    .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 11px solid transparent; border-right: 11px solid transparent; border-top: 20px solid #1f2329; z-index: 10; }
+    .wheel-circle {
+      width: 100%; height: 100%; border-radius: 50%; border: 6px solid #1f2329;
+      background: conic-gradient(
+        #ffffff 0deg 36deg, #e5e6eb 36deg 72deg,
+        #ffffff 72deg 108deg, #e5e6eb 108deg 144deg,
+        #ffffff 144deg 180deg, #e5e6eb 180deg 216deg,
+        #ffffff 216deg 252deg, #e5e6eb 252deg 288deg,
+        #ffffff 288deg 324deg, #e5e6eb 324deg 360deg
+      );
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+      box-shadow: 0 8px 24px rgba(31,35,41,0.08);
+    }
+    .wheel-center { width: 64px; height: 64px; border-radius: 50%; background: #1f2329; color: #ffffff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.3; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
   </style>
 </head>
 <body>
@@ -33,255 +63,159 @@
 
   <div class="container">
     <!-- 登入區塊 -->
-    <div id="viewLogin" class="card" style="margin-top:30px;">
-      <h2 style="text-align:center; margin:0 0 6px;">數位網銀安全登入</h2>
-      <p style="text-align:center; color:#86909c; font-size:13px; margin:0 0 24px;">請輸入專屬帳號與密碼</p>
-      <label>帳號 (manmei / yijun)</label>
+    <div id="viewLogin" class="card" style="margin-top:34px; padding:36px 24px;">
+      <h2 style="text-align:center; margin:0 0 6px; font-size:20px;">數位網銀安全登入</h2>
+      <p style="text-align:center; color:#86909c; font-size:13px; margin:0 0 26px;">請輸入專屬帳號與密碼</p>
+      <label>使用者帳號</label>
       <input type="text" id="inUser" placeholder="請輸入帳號">
-      <label>密碼 (管理員 0427 / 使用者 1234)</label>
+      <label>登入密碼</label>
       <input type="password" id="inPwd" placeholder="請輸入密碼">
       <button type="button" class="btn" onclick="login()">登入網銀</button>
     </div>
 
     <!-- 主畫面區塊 -->
     <div id="viewMain" style="display:none;">
-      <div class="card" style="padding:14px 16px; display:flex; align-items:center; gap:10px;">
-        <span>🔔</span>
+      <div class="card" style="padding:13px 16px; display:flex; align-items:center; gap:12px;">
+        <div style="width:36px; height:36px; border-radius:10px; background:#f4f5f7; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0;">🔔</div>
         <div>
-          <div style="font-weight:700; font-size:13px;" id="uiNoticeTitle">請勿依他人指示操作轉帳</div>
-          <div style="font-size:12px; color:#86909c;" id="uiNoticeSub">小心甜蜜詐騙以確保點數安全</div>
+          <div style="font-weight:700; font-size:13px; margin-bottom:2px;" id="uiNoticeTitle">請勿依他人指示操作轉帳</div>
+          <div style="font-size:12px; color:#86909c;" id="uiNoticeSub">小心甜蜜詐騙以確保帳戶資金安全</div>
         </div>
+      </div>
+
+      <div style="font-size:14px; font-weight:700; margin:0 0 10px 2px;">常用功能</div>
+      <div class="quick-grid">
+        <button type="button" class="quick-btn active" id="q1" onclick="goTab(1)">存款總覽</button>
+        <button type="button" class="quick-btn" id="q2" onclick="goTab(2)">兌換獎勵</button>
+        <button type="button" class="quick-btn" id="q4" onclick="goTab(4)">每日轉盤</button>
+        <button type="button" class="quick-btn" onclick="showSupport()">專屬客服</button>
       </div>
 
       <div class="tabs">
-        <div class="tab active" id="t1" onclick="goTab(1)">點數總覽</div>
-        <div class="tab" id="t2" onclick="goTab(2)">兌換獎勵</div>
+        <div class="tab active" id="t1" onclick="goTab(1)">總覽</div>
+        <div class="tab" id="t2" onclick="goTab(2)">獎勵兌換</div>
+        <div class="tab" id="t4" onclick="goTab(4)">每日轉盤</div>
         <div class="tab" id="t3" onclick="goTab(3)">往來明細</div>
       </div>
 
-      <!-- 1. 總覽 -->
+      <!-- 1. 總覽 (新台幣 TWD) -->
       <div id="p1" class="card">
-        <div style="font-weight:700; margin-bottom:16px;" id="uiCardName">點數概況</div>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <div style="width:64px; height:64px; border-radius:50%; border:8px solid #e5e6eb; border-top-color:#4e5969;"></div>
+        <div style="font-weight:700; font-size:15px; margin-bottom:18px;" id="uiCardName">存款概況</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:22px;">
+          <div style="width:68px; height:68px; border-radius:50%; border:9px solid #e5e6eb; border-top-color:#4e5969; border-right-color:#86909c;"></div>
           <div style="text-align:right;">
-            <div style="font-size:12px; color:#86909c;" id="uiUnit">可用總點數 PTS</div>
-            <div style="font-size:32px; font-weight:700;" id="uiBal">0</div>
+            <div style="font-size:12px; color:#86909c; margin-bottom:4px;">等值新台幣 TWD</div>
+            <div style="font-size:34px; font-weight:700; letter-spacing:-0.5px;" id="uiBal">0</div>
           </div>
         </div>
         <div style="border-top:1px solid #e5e6eb; padding-top:12px; font-size:14px;">
-          <div style="display:flex; justify-content:space-between; padding:6px 0;">
-            <span style="color:#4e5969;">活期可用點數</span>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0;">
+            <div style="display:flex; align-items:center; gap:10px; color:#4e5969;">
+              <span style="width:4px; height:14px; border-radius:2px; background:#1f2329;"></span>
+              <span>臺幣綜存、活存</span>
+            </div>
             <span style="font-weight:600;" id="uiSub1">0</span>
           </div>
         </div>
+        <div onclick="goTab(2)" style="margin-top:14px; padding-top:12px; border-top:1px solid #e5e6eb; text-align:center; font-size:13px; font-weight:600; color:#4e5969; cursor:pointer;">
+          前往兌換專屬獎勵 &gt;
+        </div>
       </div>
 
-      <!-- 2. 兌換 -->
+      <!-- 2. 獎勵兌換商城 (新台幣) -->
       <div id="p2" style="display:none;">
+        <div style="font-size:14px; font-weight:700; margin:0 0 10px 2px;">專屬獎勵兌換 (新台幣計價)</div>
         <div class="grid-2" id="uiRewards"></div>
       </div>
 
-      <!-- 3. 明細 -->
-      <div id="p3" class="card" style="display:none; padding:6px 16px;">
-        <div id="uiHistory"></div>
+      <!-- 3. 往來明細 -->
+      <div id="p3" style="display:none;">
+        <div style="font-size:14px; font-weight:700; margin:0 0 10px 2px;">近期往來明細 (TWD)</div>
+        <div class="card" style="padding:6px 16px;">
+          <div id="uiHistory"></div>
+        </div>
       </div>
 
-      <!-- 管理員後台 (僅 manmei 可見) -->
-      <div id="adminBox" class="card" style="display:none; border:1.5px solid #1f2329; margin-top:24px;">
-        <h3 style="margin:0 0 14px; font-size:15px;">⚙️ 管理員控制中心 (manmei)</h3>
+      <!-- 4. 每日登入轉盤 (1~10元) -->
+      <div id="p4" class="card" style="display:none; text-align:center;">
+        <div style="font-weight:700; font-size:16px; margin-bottom:4px;">每日登入幸運轉盤</div>
+        <div style="font-size:12px; color:#86909c; margin-bottom:10px;">每日可免費轉動一次，隨機獲得新台幣 1 ~ 10 元</div>
         
-        <label>1. 新增入帳 / 扣款明細 (自動加減餘額)</label>
-        <input type="text" id="aDesc" placeholder="項目說明 (例如：乖乖獎勵)">
-        <input type="number" id="aAmt" placeholder="金額 (加點輸入 500，扣點輸入 -100)">
-        <button type="button" class="btn-outline" style="margin-bottom:18px;" onclick="addTx()">確認新增明細</button>
+        <div class="wheel-wrap">
+          <div class="wheel-pointer"></div>
+          <div class="wheel-circle" id="wheelCircle">
+            <div class="wheel-center">TWD<br>1~10元</div>
+          </div>
+        </div>
 
-        <label>2. 上架新兌換獎勵</label>
-        <input type="text" id="aRName" placeholder="獎勵名稱 (例如：按摩 30 分鐘)">
-        <input type="number" id="aRCost" placeholder="所需點數 (例如：300)">
-        <button type="button" class="btn-outline" style="margin-bottom:18px;" onclick="addReward()">上架獎勵</button>
-
-        <label>3. 直接修改文字與總餘額</label>
-        <input type="text" id="aTitle" placeholder="頂部網銀名稱">
-        <input type="text" id="aNotice1" placeholder="公告主標題">
-        <input type="text" id="aNotice2" placeholder="公告副標題">
-        <input type="number" id="aNewBal" placeholder="總餘額數字">
-        <button type="button" class="btn" onclick="saveSettings()">儲存所有修改</button>
+        <div id="spinStatusText" style="font-size:13px; font-weight:600; color:#4e5969; margin-bottom:14px;">今日尚未抽獎</div>
+        <button type="button" class="btn" id="btnSpin" onclick="spinWheel()">立即轉動抽獎</button>
       </div>
 
-      <div style="text-align:center; margin-top:24px;">
-        <button type="button" onclick="logout()" style="background:#fff; border:1px solid #e5e6eb; color:#4e5969; padding:8px 24px; border-radius:20px; cursor:pointer;">登出系統</button>
+      <!-- 管理員控制中心 (僅 manmei 可見) -->
+      <div id="adminBox" class="card" style="display:none; border:1.5px solid #c9cdd4; margin-top:26px;">
+        <h3 style="margin:0 0 14px; font-size:15px; border-bottom:1px solid #e5e6eb; padding-bottom:10px;">⚙️ 管理員控制中心 (僅 manmei 可修改)</h3>
+        
+        <!-- 區塊1：新增入帳扣款 -->
+        <div class="admin-sub">
+          <div class="admin-sub-title">1. 新增入帳 / 扣款明細 (新台幣 TWD)</div>
+          <input type="text" id="aDesc" placeholder="項目說明 (例如：乖乖表現獎勵)">
+          <input type="number" id="aAmt" placeholder="金額 (存入輸入正數如 500，扣款輸入負數如 -100)">
+          <button type="button" class="btn-outline" onclick="addTx()">確認新增明細並更新餘額</button>
+        </div>
+
+        <!-- 區塊2：管理兌換獎勵 (新增 + 隨時修改現有獎勵與金額) -->
+        <div class="admin-sub">
+          <div class="admin-sub-title">2. 獎勵兌換管理 (隨時修改金額或新增項目)</div>
+          
+          <label>新增兌換獎勵：</label>
+          <div style="display:flex; gap:6px; margin-bottom:12px;">
+            <input type="text" id="aRName" placeholder="獎勵名稱" style="margin-bottom:0;">
+            <input type="number" id="aRCost" placeholder="新台幣金額" style="width:110px; margin-bottom:0;">
+            <button type="button" onclick="addReward()" style="background:#1f2329; color:#fff; border:none; border-radius:8px; padding:0 14px; font-size:13px; font-weight:600; cursor:pointer; flex-shrink:0;">新增</button>
+          </div>
+
+          <label>修改現有獎勵名稱與金額：</label>
+          <div id="adminRewardEditor"></div>
+          <button type="button" class="btn-outline" style="margin-top:6px;" onclick="saveEditedRewards()">儲存獎勵列表修改</button>
+        </div>
+
+        <!-- 區塊3：修改文字、客服電話、總餘額與轉盤重置 -->
+        <div class="admin-sub" style="margin-bottom:0;">
+          <div class="admin-sub-title">3. 修改介面文字、客服電話與總餘額</div>
+          <label>頂部網銀名稱</label>
+          <input type="text" id="aTitle">
+          <label>專屬客服電話</label>
+          <input type="text" id="aPhone">
+          <label>公告主標題</label>
+          <input type="text" id="aNotice1">
+          <label>公告副標題</label>
+          <input type="text" id="aNotice2">
+          <label>直接設定總餘額 (新台幣 TWD)</label>
+          <input type="number" id="aNewBal">
+          <button type="button" class="btn" style="margin-bottom:10px;" onclick="saveSettings()">儲存文字與餘額修改</button>
+          <button type="button" class="btn-outline" onclick="resetDailySpin()">重置今日轉盤抽獎紀錄 (讓今日可再轉一次)</button>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:26px;">
+        <button type="button" onclick="logout()" style="background:#ffffff; border:1px solid #e5e6eb; color:#4e5969; padding:8px 24px; border-radius:20px; font-size:12px; cursor:pointer;">登出網銀系統</button>
       </div>
     </div>
   </div>
 
   <script>
-    var curUser = "";
-    var db = {
+    window.curUser = "";
+    window.isSpinning = false;
+    window.wheelDeg = 0;
+
+    window.dbData = {
       title: "Yi Jun bank",
+      phone: "0903122912",
       notice1: "請勿依他人指示操作轉帳",
-      notice2: "小心甜蜜詐騙以確保點數安全",
+      notice2: "小心甜蜜詐騙以確保帳戶資金安全",
       bal: 13140,
+      lastSpinDate: "",
       rewards: [
         { name: "肩頸按摩 20 分鐘", cost: 500 },
-        { name: "指定大餐一頓", cost: 1500 },
-        { name: "無條件原諒券", cost: 3000 }
-      ],
-      history: [
-        { desc: "開戶尊榮禮金", amt: 13140, date: "2026-11-18" }
-      ]
-    };
-
-    try {
-      var saved = localStorage.getItem("yijun_bank_data");
-      if (saved) db = JSON.parse(saved);
-    } catch (e) {}
-
-    function saveLocal() {
-      try { localStorage.setItem("yijun_bank_data", JSON.stringify(db)); } catch (e) {}
-    }
-
-    function goTab(n) {
-      document.getElementById("p1").style.display = n === 1 ? "block" : "none";
-      document.getElementById("p2").style.display = n === 2 ? "block" : "none";
-      document.getElementById("p3").style.display = n === 3 ? "block" : "none";
-      document.getElementById("t1").className = n === 1 ? "tab active" : "tab";
-      document.getElementById("t2").className = n === 2 ? "tab active" : "tab";
-      document.getElementById("t3").className = n === 3 ? "tab active" : "tab";
-    }
-
-    function render() {
-      document.getElementById("uiTitle").innerText = db.title;
-      document.getElementById("uiNoticeTitle").innerText = db.notice1;
-      document.getElementById("uiNoticeSub").innerText = db.notice2;
-      document.getElementById("uiBal").innerText = Number(db.bal).toLocaleString();
-      document.getElementById("uiSub1").innerText = Number(db.bal).toLocaleString();
-
-      if (curUser === "manmei") {
-        document.getElementById("aTitle").value = db.title;
-        document.getElementById("aNotice1").value = db.notice1;
-        document.getElementById("aNotice2").value = db.notice2;
-        document.getElementById("aNewBal").value = db.bal;
-      }
-
-      var rHtml = "";
-      for (var i = 0; i < db.rewards.length; i++) {
-        var r = db.rewards[i];
-        var ok = db.bal >= r.cost;
-        var delBtn = curUser === "manmei" ? '<button type="button" onclick="delReward(' + i + ')" style="width:100%; margin-top:6px; background:#ffece8; color:#cb2634; border:none; padding:5px; border-radius:6px; font-size:11px; cursor:pointer;">下架</button>' : '';
-        rHtml += '<div class="card" style="padding:16px; margin-bottom:0;">' +
-          '<div style="font-weight:700; font-size:14px; margin-bottom:4px;">' + r.name + '</div>' +
-          '<div style="font-size:12px; color:#86909c; margin-bottom:12px;">需 ' + r.cost + ' 點</div>' +
-          '<button type="button" class="btn" style="padding:8px; font-size:12px; background:' + (ok ? '#1f2329' : '#e5e6eb') + '; color:' + (ok ? '#fff' : '#86909c') + ';" ' + (ok ? '' : 'disabled') + ' onclick="redeem(' + i + ')">' + (ok ? '立即兌換' : '點數不足') + '</button>' +
-          delBtn + '</div>';
-      }
-      document.getElementById("uiRewards").innerHTML = rHtml;
-
-      var hHtml = "";
-      for (var j = 0; j < db.history.length; j++) {
-        var h = db.history[j];
-        var plus = h.amt >= 0;
-        var dBtn = curUser === "manmei" ? '<button type="button" onclick="delTx(' + j + ')" style="margin-left:8px; background:#ffece8; color:#cb2634; border:none; padding:3px 6px; border-radius:4px; font-size:11px; cursor:pointer;">刪</button>' : '';
-        hHtml += '<div class="tx-row">' +
-          '<div><div style="font-weight:600;">' + h.desc + '</div><div style="font-size:11px; color:#86909c;">' + h.date + '</div></div>' +
-          '<div><span style="font-weight:700; color:' + (plus ? '#009a29' : '#cb2634') + ';">' + (plus ? '+' : '') + h.amt + '</span>' + dBtn + '</div>' +
-          '</div>';
-      }
-      document.getElementById("uiHistory").innerHTML = hHtml || '<div style="padding:16px; text-align:center; color:#86909c; font-size:13px;">尚無明細</div>';
-    }
-
-    function login() {
-      var u = document.getElementById("inUser").value.trim().toLowerCase();
-      var p = document.getElementById("inPwd").value.trim();
-      if (u === "manmei" && p === "0427") {
-        curUser = "manmei";
-        document.getElementById("uiRole").innerText = "管理員：MANMEI";
-        document.getElementById("adminBox").style.display = "block";
-      } else if (u === "yijun" && p === "1234") {
-        curUser = "yijun";
-        document.getElementById("uiRole").innerText = "使用者：YIJUN";
-        document.getElementById("adminBox").style.display = "none";
-      } else {
-        alert("帳號或密碼錯誤！");
-        return;
-      }
-      document.getElementById("viewLogin").style.display = "none";
-      document.getElementById("viewMain").style.display = "block";
-      goTab(1);
-      render();
-    }
-
-    function logout() {
-      curUser = "";
-      document.getElementById("inUser").value = "";
-      document.getElementById("inPwd").value = "";
-      document.getElementById("viewMain").style.display = "none";
-      document.getElementById("viewLogin").style.display = "block";
-      document.getElementById("uiRole").innerText = "未登入";
-    }
-
-    function redeem(i) {
-      var r = db.rewards[i];
-      if (db.bal < r.cost) return;
-      if (!confirm("確定花費 " + r.cost + " 點兌換「" + r.name + "」？")) return;
-      db.bal -= r.cost;
-      db.history.unshift({ desc: "兌換：" + r.name, amt: -r.cost, date: new Date().toISOString().split('T')[0] });
-      saveLocal();
-      render();
-      alert("兌換成功！請截圖向管理員領取。");
-    }
-
-    function addTx() {
-      if (curUser !== "manmei") return;
-      var desc = document.getElementById("aDesc").value.trim();
-      var amt = Number(document.getElementById("aAmt").value);
-      if (!desc || isNaN(amt) || amt === 0) { alert("請輸入完整說明與金額"); return; }
-      db.bal += amt;
-      db.history.unshift({ desc: desc, amt: amt, date: new Date().toISOString().split('T')[0] });
-      document.getElementById("aDesc").value = "";
-      document.getElementById("aAmt").value = "";
-      saveLocal();
-      render();
-      alert("已新增明細並更新餘額！");
-    }
-
-    function delTx(i) {
-      if (curUser !== "manmei") return;
-      db.history.splice(i, 1);
-      saveLocal();
-      render();
-    }
-
-    function addReward() {
-      if (curUser !== "manmei") return;
-      var name = document.getElementById("aRName").value.trim();
-      var cost = Number(document.getElementById("aRCost").value);
-      if (!name || isNaN(cost) || cost <= 0) { alert("請輸入名稱與有效點數"); return; }
-      db.rewards.push({ name: name, cost: cost });
-      document.getElementById("aRName").value = "";
-      document.getElementById("aRCost").value = "";
-      saveLocal();
-      render();
-      alert("上架成功！");
-    }
-
-    function delReward(i) {
-      if (curUser !== "manmei") return;
-      db.rewards.splice(i, 1);
-      saveLocal();
-      render();
-    }
-
-    function saveSettings() {
-      if (curUser !== "manmei") return;
-      db.title = document.getElementById("aTitle").value;
-      db.notice1 = document.getElementById("aNotice1").value;
-      db.notice2 = document.getElementById("aNotice2").value;
-      db.bal = Number(document.getElementById("aNewBal").value);
-      saveLocal();
-      render();
-      alert("修改已儲存！");
-    }
-  </script>
-</body>
-</html>
+        { name: "指定
