@@ -49,6 +49,7 @@
   </div>
 
   <div class="container">
+    <!-- 登入畫面 -->
     <div id="viewLogin" class="card" style="margin-top:34px; padding:36px 24px;">
       <h2 style="text-align:center; margin:0 0 6px; font-size:20px;">數位網銀安全登入</h2>
       <p style="text-align:center; color:#86909c; font-size:13px; margin:0 0 26px;">請輸入專屬帳號與密碼</p>
@@ -59,6 +60,7 @@
       <button type="button" class="btn" id="loginBtn">登入網銀</button>
     </div>
 
+    <!-- 主畫面 -->
     <div id="viewMain" style="display:none;">
       <div class="card" style="padding:13px 16px; display:flex; align-items:center; gap:12px;">
         <div style="width:36px; height:36px; border-radius:10px; background:#f4f5f7; display:flex; align-items:center; justify-content:center; font-size:17px;">🔔</div>
@@ -83,6 +85,7 @@
         <div class="tab" id="t3">往來明細</div>
       </div>
 
+      <!-- 1. 存款總覽 (附帶 2023.09.05 ❤️) -->
       <div id="p1" class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
           <div style="font-weight:700; font-size:15px;">存款概況</div>
@@ -101,16 +104,19 @@
         </div>
       </div>
 
+      <!-- 2. 兌換獎勵 -->
       <div id="p2" style="display:none;">
         <div style="font-size:14px; font-weight:700; margin:0 0 10px 2px;">專屬獎勵兌換 (新台幣計價)</div>
         <div class="grid-2" id="uiRewards"></div>
       </div>
 
+      <!-- 3. 往來明細 -->
       <div id="p3" style="display:none;">
         <div style="font-size:14px; font-weight:700; margin:0 0 10px 2px;">近期往來明細 (TWD)</div>
         <div class="card" style="padding:6px 16px;"><div id="uiHistory"></div></div>
       </div>
 
+      <!-- 4. 每日抽獎 (10 ~ 100元隨機) -->
       <div id="p4" class="card" style="display:none; text-align:center;">
         <div style="font-weight:700; font-size:16px; margin-bottom:4px;">每日幸運大抽獎</div>
         <div style="font-size:12px; color:#86909c;">每日可免費抽獎一次，隨機獲得新台幣 10 ~ 100 元</div>
@@ -122,6 +128,7 @@
         <button type="button" class="btn" id="btnSpin">立即抽獎拿紅包</button>
       </div>
 
+      <!-- 管理員控制中心 -->
       <div id="adminBox" class="card" style="display:none; border:1.5px solid #c9cdd4; margin-top:26px;">
         <h3 style="margin:0 0 14px; font-size:15px;">⚙️ 管理員控制中心</h3>
         
@@ -170,7 +177,7 @@
       phone: "0903122912",
       notice1: "請勿依他人指示操作轉帳",
       notice2: "小心甜蜜詐騙以確保帳戶資金安全",
-      bal: 13140,
+      bal: 13297,
       lastSpinDate: "",
       rewards: [
         { name: "指定大餐一頓$1000", cost: 1500 },
@@ -186,12 +193,12 @@
     };
 
     try {
-      var local = localStorage.getItem("yijun_bank_final_v8");
+      var local = localStorage.getItem("yijun_bank_final_v6");
       if (local) dbData = JSON.parse(local);
     } catch (e) {}
 
     function persist() {
-      try { localStorage.setItem("yijun_bank_final_v8", JSON.stringify(dbData)); } catch (e) {}
+      try { localStorage.setItem("yijun_bank_final_v6", JSON.stringify(dbData)); } catch (e) {}
     }
 
     function getToday() {
@@ -417,7 +424,7 @@
         dbData.phone = document.getElementById("aPhone").value;
         dbData.notice1 = document.getElementById("aNotice1").value;
         dbData.notice2 = document.getElementById("aNotice2").value;
-        dbData.bal = Number(document.getElementById("aNewBal").value);
+        dbData.bal = Number(dbData.bal) + (Number(document.getElementById("aNewBal").value) - dbData.bal);
         persist();
         render();
         alert("修改已儲存！");
