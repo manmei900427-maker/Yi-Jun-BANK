@@ -56,7 +56,7 @@
       <input type="text" id="inUser" placeholder="請輸入帳號">
       <label>登入密碼</label>
       <input type="password" id="inPwd" placeholder="請輸入密碼">
-      <button type="button" class="btn" onclick="doLogin()">登入網銀</button>
+      <button type="button" class="btn" id="loginActionBtn">登入網銀</button>
     </div>
 
     <div id="viewMain" style="display:none;">
@@ -70,17 +70,17 @@
 
       <div style="font-size:14px; font-weight:700; margin:0 0 10px 2px;">常用功能</div>
       <div class="quick-grid">
-        <button type="button" class="quick-btn active" id="q1" onclick="goTab(1)">存款總覽</button>
-        <button type="button" class="quick-btn" id="q2" onclick="goTab(2)">兌換獎勵</button>
-        <button type="button" class="quick-btn" id="q4" onclick="goTab(4)">每日轉盤</button>
-        <button type="button" class="quick-btn" onclick="showSupport()">專屬客服</button>
+        <button type="button" class="quick-btn active" id="q1">存款總覽</button>
+        <button type="button" class="quick-btn" id="q2">兌換獎勵</button>
+        <button type="button" class="quick-btn" id="q4">每日轉盤</button>
+        <button type="button" class="quick-btn" id="qSupport">專屬客服</button>
       </div>
 
       <div class="tabs">
-        <div class="tab active" id="t1" onclick="goTab(1)">總覽</div>
-        <div class="tab" id="t2" onclick="goTab(2)">獎勵兌換</div>
-        <div class="tab" id="t4" onclick="goTab(4)">每日轉盤</div>
-        <div class="tab" id="t3" onclick="goTab(3)">往來明細</div>
+        <div class="tab active" id="t1">總覽</div>
+        <div class="tab" id="t2">獎勵兌換</div>
+        <div class="tab" id="t4">每日轉盤</div>
+        <div class="tab" id="t3">往來明細</div>
       </div>
 
       <div id="p1" class="card">
@@ -116,7 +116,7 @@
           <div class="wheel-circle" id="wheelCircle"><div class="wheel-center">TWD<br>1~10元</div></div>
         </div>
         <div id="spinStatusText" style="font-size:13px; font-weight:600; color:#4e5969; margin-bottom:14px;">今日尚未抽獎</div>
-        <button type="button" class="btn" id="btnSpin" onclick="spinWheel()">立即轉動抽獎</button>
+        <button type="button" class="btn" id="btnSpin">立即轉動抽獎</button>
       </div>
 
       <div id="adminBox" class="card" style="display:none; border:1.5px solid #c9cdd4; margin-top:26px;">
@@ -126,7 +126,7 @@
           <div style="font-weight:700; font-size:13px; margin-bottom:8px;">1. 新增入帳 / 扣款明細 (TWD)</div>
           <input type="text" id="aDesc" placeholder="項目說明">
           <input type="number" id="aAmt" placeholder="金額 (存入正數，扣款負數)">
-          <button type="button" class="btn-outline" onclick="addTx()">確認新增明細並更新餘額</button>
+          <button type="button" class="btn-outline" id="btnAddTx">確認新增明細並更新餘額</button>
         </div>
 
         <div class="admin-sub">
@@ -134,10 +134,10 @@
           <div style="display:flex; gap:6px; margin-bottom:12px;">
             <input type="text" id="aRName" placeholder="獎勵名稱" style="margin-bottom:0;">
             <input type="number" id="aRCost" placeholder="金額" style="width:100px; margin-bottom:0;">
-            <button type="button" onclick="addReward()" style="background:#1f2329; color:#fff; border:none; border-radius:8px; padding:0 14px; font-size:13px; font-weight:600; cursor:pointer;">新增</button>
+            <button type="button" id="btnAddReward" style="background:#1f2329; color:#fff; border:none; border-radius:8px; padding:0 14px; font-size:13px; font-weight:600; cursor:pointer;">新增</button>
           </div>
           <div id="adminRewardEditor"></div>
-          <button type="button" class="btn-outline" style="margin-top:6px;" onclick="saveEditedRewards()">儲存獎勵列表修改</button>
+          <button type="button" class="btn-outline" style="margin-top:6px;" id="btnSaveRewards">儲存獎勵列表修改</button>
         </div>
 
         <div class="admin-sub" style="margin-bottom:0;">
@@ -147,71 +147,64 @@
           <label>公告主標題</label><input type="text" id="aNotice1">
           <label>公告副標題</label><input type="text" id="aNotice2">
           <label>總餘額 (新台幣 TWD)</label><input type="number" id="aNewBal">
-          <button type="button" class="btn" style="margin-bottom:10px;" onclick="saveSettings()">儲存文字與餘額修改</button>
-          <button type="button" class="btn-outline" onclick="resetDailySpin()">重置今日轉盤次數</button>
+          <button type="button" class="btn" style="margin-bottom:10px;" id="btnSaveSettings">儲存文字與餘額修改</button>
+          <button type="button" class="btn-outline" id="btnResetSpin">重置今日轉盤次數</button>
         </div>
       </div>
 
       <div style="text-align:center; margin-top:26px;">
-        <button type="button" onclick="logout()" style="background:#fff; border:1px solid #e5e6eb; color:#4e5969; padding:8px 24px; border-radius:20px; font-size:12px; cursor:pointer;">登出網銀系統</button>
+        <button type="button" id="btnLogout" style="background:#fff; border:1px solid #e5e6eb; color:#4e5969; padding:8px 24px; border-radius:20px; font-size:12px; cursor:pointer;">登出網銀系統</button>
       </div>
     </div>
   </div>
 
   <script>
-    var curUser = "";
-    var isSpinning = false;
-    var wheelDeg = 0;
-    var dbData = {
-      title: "Yi Jun bank",
-      phone: "0903122912",
-      notice1: "請勿依他人指示操作轉帳",
-      notice2: "小心甜蜜詐騙以確保帳戶資金安全",
-      bal: 13140,
-      lastSpinDate: "",
-      rewards: [
-        { name: "肩頸按摩 20 分鐘", cost: 500 },
-        { name: "指定大餐一頓", cost: 1500 },
-        { name: "無條件原諒券", cost: 3000 }
-      ],
-      history: [{ desc: "開戶尊榮禮金", amt: 13140, date: "2026-11-18" }]
-    };
+    (function() {
+      var curUser = "";
+      var isSpinning = false;
+      var wheelDeg = 0;
+      var dbData = {
+        title: "Yi Jun bank",
+        phone: "0903122912",
+        notice1: "請勿依他人指示操作轉帳",
+        notice2: "小心甜蜜詐騙以確保帳戶資金安全",
+        bal: 13140,
+        lastSpinDate: "",
+        rewards: [
+          { name: "肩頸按摩 20 分鐘", cost: 500 },
+          { name: "指定大餐一頓", cost: 1500 },
+          { name: "無條件原諒券", cost: 3000 }
+        ],
+        history: [{ desc: "開戶尊榮禮金", amt: 13140, date: "2026-11-18" }]
+      };
 
-    try {
-      var local = localStorage.getItem("yijun_twd_v3");
-      if (local) dbData = JSON.parse(local);
-    } catch (e) {}
+      try {
+        var local = localStorage.getItem("yijun_bank_final");
+        if (local) dbData = JSON.parse(local);
+      } catch (e) {}
 
-    function saveAllData() {
-      try { localStorage.setItem("yijun_twd_v3", JSON.stringify(dbData)); } catch (e) {}
-      if (window.pushToCloud) window.pushToCloud(dbData);
-    }
+      window.getBankData = function() { return dbData; };
+      window.setBankData = function(newData) {
+        dbData = Object.assign(dbData, newData);
+        try { localStorage.setItem("yijun_bank_final", JSON.stringify(dbData)); } catch (e) {}
+        if (curUser) render();
+      };
 
-    function getTodayStr() {
-      var d = new Date();
-      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
-    }
+      function saveData() {
+        try { localStorage.setItem("yijun_bank_final", JSON.stringify(dbData)); } catch (e) {}
+        if (window.cloudSave) window.cloudSave(dbData);
+      }
 
-    function showSupport() {
-      alert("【Yi Jun bank 專屬客服】\n\n客服專線：" + (dbData.phone || "0903122912") + "\n服務時間：24 小時全年無休");
-    }
+      function getToday() {
+        var d = new Date();
+        return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+      }
 
-    function goTab(n) {
-      document.getElementById("p1").style.display = n === 1 ? "block" : "none";
-      document.getElementById("p2").style.display = n === 2 ? "block" : "none";
-      document.getElementById("p3").style.display = n === 3 ? "block" : "none";
-      document.getElementById("p4").style.display = n === 4 ? "block" : "none";
-      document.getElementById("t1").className = n === 1 ? "tab active" : "tab";
-      document.getElementById("t2").className = n === 2 ? "tab active" : "tab";
-      document.getElementById("t3").className = n === 3 ? "tab active" : "tab";
-      document.getElementById("t4").className = n === 4 ? "tab active" : "tab";
-      document.getElementById("q1").className = n === 1 ? "quick-btn active" : "quick-btn";
-      document.getElementById("q2").className = n === 2 ? "quick-btn active" : "quick-btn";
-      document.getElementById("q4").className = n === 4 ? "quick-btn active" : "quick-btn";
-    }
-
-    function render() {
-      document.getElementById("uiTitle").innerText = dbData.title;
-      document.getElementById("uiNoticeTitle").innerText = dbData.notice1;
-      document.getElementById("uiNoticeSub").innerText = dbData.notice2;
-      document.getElementById("uiBal").innerText = Number(dbData.bal
+      function goTab(n) {
+        document.getElementById("p1").style.display = (n === 1) ? "block" : "none";
+        document.getElementById("p2").style.display = (n === 2) ? "block" : "none";
+        document.getElementById("p3").style.display = (n === 3) ? "block" : "none";
+        document.getElementById("p4").style.display = (n === 4) ? "block" : "none";
+        document.getElementById("t1").className = (n === 1) ? "tab active" : "tab";
+        document.getElementById("t2").className = (n === 2) ? "tab active" : "tab";
+        document.getElementById("t3").className = (n === 3) ? "tab active"
