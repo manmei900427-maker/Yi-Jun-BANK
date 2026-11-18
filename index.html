@@ -3,36 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>高級灰專屬數位網銀</title>
+  <title>高級灰白私人數位網銀</title>
   <style>
     :root {
-      --bg-page: #f2f3f5;
-      --surface: #ffffff;
-      --gray-dark: #2c2e33;
-      --gray-medium: #5a5e66;
-      --gray-light: #909399;
-      --accent-slate: #4a5568;
-      --border-line: #e4e7ed;
-      --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.04);
+      --bg-mist: #f4f5f7;
+      --surface-white: #ffffff;
+      --surface-soft: #f9fafb;
+      --slate-900: #1f2329;
+      --slate-700: #4e5969;
+      --slate-500: #86909c;
+      --slate-300: #c9cdd4;
+      --border-light: #e5e6eb;
+      --shadow-card: 0 4px 20px rgba(31, 35, 41, 0.04);
     }
     * { box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: var(--bg-page);
-      color: var(--gray-dark);
+      background-color: var(--bg-mist);
+      color: var(--slate-900);
       margin: 0;
       padding: 0;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* 頂部高級灰導覽列 */
+    /* 頂部純白微霧導覽列 */
     .top-bar {
-      background-color: var(--surface);
-      padding: 14px 18px;
+      background-color: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      padding: 15px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border-line);
+      border-bottom: 1px solid var(--border-light);
       position: sticky;
       top: 0;
       z-index: 20;
@@ -40,49 +42,51 @@
     .top-title {
       font-size: 16px;
       font-weight: 700;
-      color: var(--gray-dark);
-      letter-spacing: 0.5px;
+      color: var(--slate-900);
+      letter-spacing: 0.8px;
     }
     .user-pill {
       font-size: 12px;
-      background: #ebeef5;
-      color: var(--gray-medium);
+      background: var(--bg-mist);
+      color: var(--slate-700);
       padding: 4px 12px;
       border-radius: 20px;
       font-weight: 600;
+      border: 1px solid var(--border-light);
     }
 
     .app-container {
       max-width: 440px;
       margin: 0 auto;
-      padding: 16px 16px 60px 16px;
+      padding: 18px 16px 60px 16px;
     }
 
     /* 登入畫面 */
     #loginView {
-      background: var(--surface);
-      border-radius: 20px;
-      padding: 36px 24px;
-      margin-top: 40px;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--border-line);
+      background: var(--surface-white);
+      border-radius: 22px;
+      padding: 40px 26px;
+      margin-top: 44px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-light);
     }
     #loginView h2 {
       margin: 0 0 6px 0;
       font-size: 20px;
-      color: var(--gray-dark);
+      color: var(--slate-900);
       text-align: center;
+      letter-spacing: 0.5px;
     }
     #loginView p {
-      margin: 0 0 26px 0;
+      margin: 0 0 28px 0;
       font-size: 13px;
-      color: var(--gray-light);
+      color: var(--slate-500);
       text-align: center;
     }
     .field-label {
       display: block;
       font-size: 12px;
-      color: var(--gray-medium);
+      color: var(--slate-700);
       margin-bottom: 6px;
       font-weight: 600;
     }
@@ -91,72 +95,74 @@
       padding: 12px 14px;
       margin-bottom: 16px;
       border-radius: 10px;
-      border: 1px solid var(--border-line);
-      background: #f8f9fa;
-      color: var(--gray-dark);
+      border: 1px solid var(--border-light);
+      background: var(--surface-soft);
+      color: var(--slate-900);
       font-size: 14px;
       outline: none;
+      transition: 0.2s;
     }
     .text-input:focus {
-      border-color: var(--accent-slate);
-      background: #ffffff;
+      border-color: var(--slate-700);
+      background: var(--surface-white);
     }
-    .btn-dark {
+    .btn-primary {
       width: 100%;
       padding: 13px;
       border: none;
       border-radius: 10px;
-      background: var(--gray-dark);
+      background: var(--slate-900);
       color: #ffffff;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
+      letter-spacing: 0.5px;
     }
-    .btn-dark:active { opacity: 0.9; }
+    .btn-primary:active { opacity: 0.88; }
 
     /* 網銀主畫面 */
     #mainView { display: none; }
 
-    /* 頂部安全/公告提示橫幅 (仿玉山安全提示欄) */
+    /* 頂部公告提示橫幅 */
     .alert-banner {
-      background: var(--surface);
+      background: var(--surface-white);
       border-radius: 14px;
-      padding: 12px 16px;
+      padding: 13px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 18px;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--border-line);
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-light);
     }
     .alert-icon {
       width: 36px;
       height: 36px;
       border-radius: 10px;
-      background: #eef0f4;
+      background: var(--bg-mist);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 17px;
       flex-shrink: 0;
     }
     .alert-content { flex: 1; }
     .alert-title {
       font-size: 13px;
       font-weight: 700;
-      color: var(--gray-dark);
+      color: var(--slate-900);
       margin-bottom: 2px;
     }
     .alert-sub {
       font-size: 12px;
-      color: var(--gray-light);
+      color: var(--slate-500);
     }
 
-    /* 常用功能區塊 (4格白底圓角卡片) */
+    /* 常用功能區塊 */
     .section-heading {
       font-size: 14px;
       font-weight: 700;
-      color: var(--gray-dark);
+      color: var(--slate-900);
       margin: 0 0 10px 2px;
     }
     .quick-grid {
@@ -166,43 +172,42 @@
       margin-bottom: 20px;
     }
     .quick-btn {
-      background: var(--surface);
-      border: 1px solid var(--border-line);
+      background: var(--surface-white);
+      border: 1px solid var(--border-light);
       border-radius: 12px;
       padding: 12px 4px;
       font-size: 13px;
       font-weight: 600;
-      color: var(--gray-dark);
-      box-shadow: var(--shadow-soft);
+      color: var(--slate-700);
+      box-shadow: var(--shadow-card);
       cursor: pointer;
       text-align: center;
+      transition: 0.15s;
     }
     .quick-btn.active {
-      background: var(--gray-dark);
+      background: var(--slate-900);
       color: #ffffff;
-      border-color: var(--gray-dark);
+      border-color: var(--slate-900);
     }
 
-    /* 分類頁籤列 (總覽 / 點數兌換 / 往來明細) */
+    /* 分類頁籤列 */
     .tab-bar {
       display: flex;
-      gap: 18px;
-      border-bottom: 1px solid var(--border-line);
+      gap: 20px;
+      border-bottom: 1px solid var(--border-light);
       margin-bottom: 16px;
       padding: 0 4px;
-      overflow-x: auto;
     }
     .tab-item {
       padding: 8px 2px 10px 2px;
       font-size: 14px;
       font-weight: 600;
-      color: var(--gray-light);
+      color: var(--slate-500);
       cursor: pointer;
       position: relative;
-      white-space: nowrap;
     }
     .tab-item.active {
-      color: var(--gray-dark);
+      color: var(--slate-900);
     }
     .tab-item.active::after {
       content: "";
@@ -211,17 +216,17 @@
       left: 0;
       right: 0;
       height: 3px;
-      background: var(--gray-dark);
+      background: var(--slate-900);
       border-radius: 3px;
     }
 
-    /* 存款/點數概況大卡片 (仿玉山總覽卡片) */
+    /* 概況大卡片 (高級灰白漸層質感) */
     .overview-card {
-      background: var(--surface);
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid var(--border-line);
+      background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-light);
       margin-bottom: 18px;
     }
     .ov-header {
@@ -229,251 +234,4 @@
       align-items: center;
       gap: 6px;
       font-size: 15px;
-      font-weight: 700;
-      color: var(--gray-dark);
-      margin-bottom: 16px;
-    }
-    .ov-top-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    /* 高級灰質感圓環 */
-    .donut-ring {
-      width: 68px;
-      height: 68px;
-      border-radius: 50%;
-      border: 9px solid #dcdfe6;
-      border-top-color: #4a5568;
-      border-right-color: #718096;
-    }
-    .ov-total-box { text-align: right; }
-    .ov-unit-label {
-      font-size: 12px;
-      color: var(--gray-light);
-      margin-bottom: 4px;
-    }
-    .ov-total-num {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--gray-dark);
-      letter-spacing: -0.5px;
-    }
-
-    /* 細項清單 (仿臺幣綜存/定存列表) */
-    .sub-list {
-      border-top: 1px solid #f0f2f5;
-      padding-top: 12px;
-    }
-    .sub-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 9px 0;
-      font-size: 14px;
-    }
-    .sub-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--gray-medium);
-    }
-    .pill-bar {
-      width: 4px;
-      height: 14px;
-      border-radius: 2px;
-    }
-    .bar-1 { background: #2c2e33; }
-    .bar-2 { background: #718096; }
-    .bar-3 { background: #a0aec0; }
-    .sub-val {
-      font-weight: 600;
-      color: var(--gray-dark);
-    }
-    .ov-footer-btn {
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid var(--border-line);
-      text-align: center;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--accent-slate);
-      cursor: pointer;
-    }
-
-    /* 點數兌換商城區塊 */
-    .redeem-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-    .reward-card {
-      background: var(--surface);
-      border: 1px solid var(--border-line);
-      border-radius: 14px;
-      padding: 16px 14px;
-      box-shadow: var(--shadow-soft);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .reward-name {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--gray-dark);
-      margin-bottom: 6px;
-    }
-    .reward-cost {
-      font-size: 13px;
-      color: var(--gray-medium);
-      margin-bottom: 14px;
-    }
-    .btn-redeem {
-      width: 100%;
-      padding: 8px;
-      border: none;
-      border-radius: 8px;
-      background: var(--gray-dark);
-      color: #ffffff;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .btn-redeem:disabled {
-      background: #dcdfe6;
-      color: #909399;
-      cursor: not-allowed;
-    }
-
-    /* 往來明細列表 */
-    .tx-card {
-      background: var(--surface);
-      border: 1px solid var(--border-line);
-      border-radius: 16px;
-      padding: 6px 16px;
-      box-shadow: var(--shadow-soft);
-    }
-    .tx-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 13px 0;
-      border-bottom: 1px solid #f0f2f5;
-    }
-    .tx-item:last-child { border-bottom: none; }
-    .tx-title { font-size: 14px; font-weight: 600; color: var(--gray-dark); }
-    .tx-date { font-size: 11px; color: var(--gray-light); margin-top: 3px; }
-    .tx-amt { font-size: 14px; font-weight: 700; }
-    .amt-in { color: #2b8a3e; }
-    .amt-out { color: #c92a2a; }
-
-    /* 管理員專屬後台 (僅 manmei 可見) */
-    .admin-section {
-      display: none;
-      background: var(--surface);
-      border: 1.5px solid var(--gray-dark);
-      border-radius: 18px;
-      padding: 20px;
-      margin-top: 24px;
-      box-shadow: var(--shadow-soft);
-    }
-    .admin-section h3 {
-      margin: 0 0 14px 0;
-      font-size: 15px;
-      color: var(--gray-dark);
-      border-bottom: 1px solid var(--border-line);
-      padding-bottom: 10px;
-    }
-    .admin-box {
-      background: #f8f9fa;
-      border: 1px solid var(--border-line);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 16px;
-    }
-    .admin-box-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--gray-dark);
-      margin-bottom: 10px;
-    }
-    .btn-outline {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid var(--gray-dark);
-      border-radius: 8px;
-      background: #ffffff;
-      color: var(--gray-dark);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .mini-del-btn {
-      background: #fee2e2;
-      color: #b91c1c;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      cursor: pointer;
-      margin-left: 8px;
-    }
-
-    .logout-area {
-      text-align: center;
-      margin-top: 26px;
-    }
-    .btn-logout {
-      background: transparent;
-      border: 1px solid #cfd3dc;
-      color: var(--gray-medium);
-      padding: 8px 24px;
-      border-radius: 20px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="top-bar">
-    <div class="top-title" id="uiTopTitle">數位私人網銀</div>
-    <div class="user-pill" id="uiUserBadge">未登入</div>
-  </div>
-
-  <div class="app-container">
-
-    <!-- 登入畫面 -->
-    <div id="loginView">
-      <h2>數位網銀安全登入</h2>
-      <p>請輸入專屬帳號與密碼</p>
-      
-      <label class="field-label">使用者帳號</label>
-      <input type="text" id="loginUser" class="text-input" placeholder="請輸入帳號">
-      
-      <label class="field-label">登入密碼</label>
-      <input type="password" id="loginPwd" class="text-input" placeholder="請輸入密碼">
-      
-      <button type="button" class="btn-dark" onclick="handleLogin()">登入網銀</button>
-    </div>
-
-    <!-- 網銀主畫面 -->
-    <div id="mainView">
-
-      <!-- 頂部公告提示欄 (仿玉山橫幅) -->
-      <div class="alert-banner">
-        <div class="alert-icon">🔔</div>
-        <div class="alert-content">
-          <div class="alert-title" id="uiBannerTitle">請勿隨意將點數轉讓他人</div>
-          <div class="alert-sub" id="uiBannerSub">小心甜蜜詐騙以確保帳戶安全</div>
-        </div>
-      </div>
-
-      <!-- 常用功能快捷列 -->
-      <div class="section-heading">常用功能</div>
-      <div class="quick-grid">
-        <button type="button" class="quick-btn active" id="qBtnOverview" onclick="switchTab('overview')">點數總覽</button>
-        <button type="button" class="quick-btn" id="qBtnRedeem" onclick="switchTab('redeem')">兌換獎勵</button>
-        <button type="button" class="quick-btn" id="qBtnHistory" onclick="switchTab('
+      font-weight:
