@@ -3,150 +3,170 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESUN E-Bank - Couple Digital Banking</title>
+  <title>LUXURY COUPLE E-BANK</title>
   <style>
     :root {
-      --esun-green: #00843d;
-      --esun-dark-green: #005a28;
-      --bg-color: #f4f6f9;
+      --bg-dark: #121212;
+      --card-bg: #1e1e1e;
+      --accent-gray: #888888;
+      --gold-color: #d4af37;
+      --text-main: #e0e0e0;
+      --text-sub: #aaaaaa;
     }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #333; }
-    .navbar { background: var(--esun-green); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .nav-brand { font-weight: bold; font-size: 18px; display: flex; align-items: center; gap: 8px; }
-    .nav-user { font-size: 13px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; }
-    .container { max-width: 480px; margin: 0 auto; padding: 20px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-dark); margin: 0; padding: 0; color: var(--text-main); }
     
-    /* Login Screen */
-    #loginScreen { background: white; border-radius: 16px; padding: 30px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; margin-top: 40px; }
-    #loginScreen h2 { color: var(--esun-green); margin-bottom: 20px; }
-    .login-input { width: 100%; padding: 12px; margin: 8px 0 16px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-size: 14px; }
-    .login-btn { background: var(--esun-green); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; }
+    /* 頂部質感導覽列 */
+    .navbar { background: #181818; border-bottom: 1px solid #333; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .nav-brand { font-weight: bold; font-size: 16px; color: var(--gold-color); letter-spacing: 1px; }
+    .nav-user { font-size: 12px; background: #2a2a2a; color: var(--gold-color); padding: 4px 12px; border-radius: 20px; border: 1px solid #444; }
 
-    /* Bank Dashboard */
+    .container { max-width: 440px; margin: 0 auto; padding: 20px; }
+    
+    /* 登入畫面 */
+    #loginScreen { background: var(--card-bg); border-radius: 16px; padding: 30px 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); text-align: center; margin-top: 40px; border: 1px solid #333; }
+    #loginScreen h2 { color: var(--gold-color); margin-bottom: 5px; font-size: 20px; }
+    #loginScreen p { color: var(--text-sub); font-size: 13px; margin-bottom: 25px; }
+    .login-input { width: 100%; padding: 12px; margin: 6px 0 16px 0; border-radius: 8px; border: 1px solid #444; background: #2a2a2a; color: white; box-sizing: border-box; font-size: 14px; text-align: center; }
+    .login-btn { background: var(--gold-color); color: #121212; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s; }
+    .login-btn:active { opacity: 0.8; }
+
+    /* 網銀主畫面 */
     #bankDashboard { display: none; }
-    .account-card { background: linear-gradient(135deg, #00843d 0%, #004d22 100%); color: white; border-radius: 16px; padding: 22px; box-shadow: 0 8px 20px rgba(0,132,61,0.25); margin-bottom: 20px; }
-    .card-type { font-size: 12px; opacity: 0.8; }
-    .card-number { font-size: 14px; letter-spacing: 2px; margin: 5px 0 15px 0; opacity: 0.9; }
-    .balance-section { border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px; display: flex; justify-content: space-between; align-items: flex-end; }
-    .balance-title { font-size: 13px; opacity: 0.85; }
-    .balance-val { font-size: 28px; font-weight: bold; color: #fff; }
+    
+    /* 高級灰金尊爵卡片 */
+    .account-card { background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%); color: white; border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); margin-bottom: 20px; border: 1px solid #444; position: relative; }
+    .card-type { font-size: 13px; color: var(--gold-color); letter-spacing: 1px; font-weight: bold; }
+    .card-number { font-size: 13px; letter-spacing: 2px; margin: 8px 0 20px 0; color: var(--text-sub); }
+    .balance-section { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .balance-title { font-size: 12px; color: var(--text-sub); }
+    .balance-val { font-size: 32px; font-weight: bold; color: #fff; }
 
-    .menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-    .menu-item { background: white; border: none; border-radius: 12px; padding: 14px 0; display: flex; flex-direction: column; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); cursor: pointer; }
-    .menu-item:active { background: #f0f7f2; }
-    
-    .notice-box { background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border-left: 4px solid var(--esun-green); font-size: 13px; color: #666; }
-    
+    /* 公告欄 */
+    .notice-box { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border-left: 4px solid var(--gold-color); font-size: 13px; color: var(--text-sub); border: 1px solid #2a2a2a; }
+    .notice-box strong { color: var(--text-main); }
+
+    /* 快捷功能方格 */
+    .menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+    .menu-item { background: var(--card-bg); border: 1px solid #2a2a2a; border-radius: 12px; padding: 14px 0; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
+    .menu-item:active { background: #2a2a2a; }
+    .menu-text { font-size: 11px; color: var(--text-main); }
+
+    /* 交易明細 */
     .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 5px; }
-    .section-title { font-size: 15px; font-weight: bold; color: #333; }
-    .tx-list { background: white; border-radius: 12px; padding: 5px 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); max-height: 220px; overflow-y: auto; }
-    .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f2f2f2; font-size: 13px; }
-    .tx-desc { font-weight: 500; color: #333; }
-    .tx-date { font-size: 11px; color: #999; margin-top: 2px; }
+    .section-title { font-size: 14px; font-weight: bold; color: var(--text-main); }
+    .tx-list { background: var(--card-bg); border-radius: 12px; padding: 5px 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); max-height: 220px; overflow-y: auto; border: 1px solid #2a2a2a; }
+    .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #2a2a2a; font-size: 13px; }
+    .tx-item:last-child { border-bottom: none; }
+    .tx-desc { font-weight: 500; color: var(--text-main); }
+    .tx-date { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
     .tx-amount { font-weight: bold; font-size: 14px; }
-    .text-success { color: #00843d; }
-    .text-danger { color: #d9534f; }
+    .text-success { color: #4cd137; }
+    .text-danger { color: #ff5252; }
 
-    .admin-panel { background: white; border-radius: 12px; padding: 20px; margin-top: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: none; }
-    .admin-panel h3 { margin-top: 0; color: var(--esun-green); font-size: 15px; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; }
-    label { font-size: 12px; color: #666; font-weight: bold; display: block; margin-top: 10px; }
-    .admin-input { width: 100%; padding: 10px; margin-top: 4px; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; font-size: 13px; }
-    .save-action-btn { background: var(--esun-green); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-    .logout-btn { background: #d9534f; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 12px; cursor: pointer; float: right; margin-top: 15px; }
+    /* 管理員後台面板 */
+    .admin-panel { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-top: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.5); border: 1px solid #444; display: none; }
+    .admin-panel h3 { margin-top: 0; color: var(--gold-color); font-size: 15px; border-bottom: 1px solid #333; padding-bottom: 8px; }
+    label { font-size: 12px; color: var(--text-sub); font-weight: bold; display: block; margin-top: 12px; text-align: left; }
+    .admin-input { width: 100%; padding: 10px; margin-top: 4px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: white; box-sizing: border-box; font-size: 13px; }
+    .save-action-btn { background: var(--gold-color); color: #121212; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+    .logout-btn { background: #333; color: var(--text-sub); border: 1px solid #444; padding: 8px 16px; border-radius: 20px; font-size: 12px; cursor: pointer; float: right; margin-top: 20px; }
   </style>
 </head>
 <body>
 
   <div class="navbar">
-    <div class="nav-brand"><span>ESUN E-Bank</span></div>
-    <div class="nav-user" id="navUserRole">Please Login</div>
+    <div class="nav-brand"><span>LUXURY E-BANK</span></div>
+    <div class="nav-user" id="navUserRole">請先登入</div>
   </div>
 
   <div class="container">
     
-    <!-- 登入畫面 -->
+    <!-- 登入畫面 (中文) -->
     <div id="loginScreen">
-      <h2>Digital Banking Login</h2>
-      <label style="text-align:left;">Username (manmei / yijun):</label>
-      <input type="text" id="loginUser" class="login-input" placeholder="Enter username">
+      <h2>情侶尊榮數位網銀</h2>
+      <p>請輸入您的專屬帳號與密碼</p>
       
-      <label style="text-align:left;">Password (1234):</label>
-      <input type="password" id="loginPwd" class="login-input" placeholder="Enter password">
+      <label style="text-align:left;">帳號 (管理員: manmei / 使用者: yijun):</label>
+      <input type="text" id="loginUser" class="login-input" placeholder="請輸入帳號">
       
-      <button type="button" class="login-btn" onclick="doLogin()">Login System</button>
+      <label style="text-align:left;">密碼 (預設: 1234):</label>
+      <input type="password" id="loginPwd" class="login-input" placeholder="請輸入密碼">
+      
+      <button type="button" class="login-btn" onclick="doLogin()">立即登入系統</button>
     </div>
 
-    <!-- 網銀主畫面 -->
+    <!-- 網銀主畫面 (高級灰風格 + 中文) -->
     <div id="bankDashboard">
       <div class="account-card">
-        <div class="card-type" id="displayBankName">Esun Couple Account</div>
-        <div class="card-number">****-5201-3140</div>
+        <div class="card-type" id="displayBankName">愛情尊爵晶片帳戶</div>
+        <div class="card-number">NO. 5201 - 3140 - 520</div>
         <div class="balance-section">
-          <div class="balance-title">Available Points Balance</div>
-          <div><span class="balance-val" id="displayBalance">0</span> <span style="font-size:14px;">pts</span></div>
+          <div class="balance-title">目前可用愛情點數餘額</div>
+          <div><span class="balance-val" id="displayBalance">5,200</span> <span style="font-size:13px; color:var(--gold-color);">點</span></div>
         </div>
       </div>
 
       <div class="notice-box">
-        <strong>Announcement:</strong><br>
-        <span id="displayNotice">Loading...</span>
+        <strong>📢 銀行公告：</strong><br>
+        <span id="displayNotice">歡迎使用情侶專屬網銀，累積點數兌換甜蜜獎勵！</span>
       </div>
 
       <div class="menu-grid">
-        <button type="button" class="menu-item" onclick="quickAction(50, 'Daily Reward')">
+        <button type="button" class="menu-item" onclick="quickAction(50, '乖乖聽話獎勵')">
           <span style="font-size:20px;">💰</span>
-          <span style="font-size:11px;">Reward</span>
+          <span class="menu-text">存入點數</span>
         </button>
-        <button type="button" class="menu-item" onclick="quickAction(-20, 'Expense Deduction')">
+        <button type="button" class="menu-item" onclick="quickAction(-20, '調皮搗蛋罰款')">
           <span style="font-size:20px;">💸</span>
-          <span style="font-size:11px;">Deduct</span>
+          <span class="menu-text">扣除點數</span>
         </button>
-        <button type="button" class="menu-item" onclick="alert('Account Status: Excellent\nSweetness Rate: 100%')">
+        <button type="button" class="menu-item" onclick="alert('帳戶狀態：極度健康\n甜蜜報酬率：每天都想見你 100%')">
           <span style="font-size:20px;">📊</span>
-          <span style="font-size:11px;">Status</span>
+          <span class="menu-text">帳務查詢</span>
         </button>
-        <button type="button" class="menu-item" onclick="alert('Security: Protected by couple love encryption.')">
+        <button type="button" class="menu-item" onclick="alert('安全提示：本行點數僅限兩人之間互寵、撒嬌與兌換願望使用！')">
           <span style="font-size:20px;">🔒</span>
-          <span style="font-size:11px;">Security</span>
+          <span class="menu-text">安全聲明</span>
         </button>
       </div>
 
       <div class="section-header">
-        <div class="section-title">Transaction History</div>
+        <div class="section-title">近期交易明細紀錄</div>
       </div>
       <div class="tx-list" id="txList">
-        <div class="tx-item">Loading records...</div>
+        <div class="tx-item">載入明細中...</div>
       </div>
 
-      <!-- 管理員專屬後台面板 (僅 manmei 登入可見) -->
+      <!-- 管理員專屬修改後台 (僅 manmei 登入可見) -->
       <div id="adminPanel" class="admin-panel">
-        <h3>Admin Control Panel (manmei only)</h3>
-        <label>Bank Title:</label>
+        <h3>⚙️ 行員專屬管理後台 (僅 manmei 可修改)</h3>
+        
+        <label>修改網銀名稱：</label>
         <input type="text" id="inputBankName" class="admin-input">
         
-        <label>Announcement:</label>
+        <label>修改公告內容：</label>
         <input type="text" id="inputNotice" class="admin-input">
         
-        <label>Total Balance:</label>
+        <label>直接修改總點數餘額：</label>
         <input type="number" id="inputBalance" class="admin-input">
         
-        <button type="button" class="save-action-btn" onclick="saveData()">Save Changes to Cloud</button>
+        <button type="button" class="save-action-btn" onclick="saveData()">確認儲存並同步至雲端</button>
       </div>
 
-      <button type="button" class="logout-btn" onclick="doLogout()">Logout</button>
+      <button type="button" class="logout-btn" onclick="doLogout()">登出系統</button>
       <div style="clear:both;"></div>
     </div>
 
   </div>
 
-  <!-- 獨立的登入控制腳本，確保按鈕秒反應 -->
+  <!-- 登入控制腳本 -->
   <script>
     window.currentUser = "";
     window.bankData = {
-      bankName: "Esun Couple Account",
-      notice: "Welcome to couple banking. Accumulate love points everyday!",
+      bankName: "愛情尊爵晶片帳戶",
+      notice: "歡迎使用情侶專屬網銀，累積點數兌換甜蜜獎勵！",
       balance: 5200,
-      history: [{ desc: "Initial Deposit", amount: 5200, date: "2026-11-18" }]
+      history: [{ desc: "開戶首刷禮金", amount: 5200, date: "2026-11-18" }]
     };
 
     window.renderUI = function() {
@@ -170,13 +190,13 @@
                 <div class="tx-date">${item.date}</div>
               </div>
               <div class="tx-amount ${isPlus ? 'text-success' : 'text-danger'}">
-                ${isPlus ? '+' : ''}${Number(item.amount).toLocaleString()} pts
+                ${isPlus ? '+' : ''}${Number(item.amount).toLocaleString()} 點
               </div>
             </div>
           `;
         });
       } else {
-        listEl.innerHTML = `<div class="tx-item">No transactions yet</div>`;
+        listEl.innerHTML = `<div class="tx-item">尚無交易紀錄</div>`;
       }
     };
 
@@ -185,7 +205,7 @@
       const p = document.getElementById("loginPwd").value.trim();
 
       if (p !== "1234") {
-        alert("Wrong password! Please enter 1234.");
+        alert("密碼錯誤！預設密碼為 1234");
         return;
       }
 
@@ -193,7 +213,7 @@
         window.currentUser = u;
         document.getElementById("loginScreen").style.display = "none";
         document.getElementById("bankDashboard").style.display = "block";
-        document.getElementById("navUserRole").innerText = "Role: " + u.toUpperCase();
+        document.getElementById("navUserRole").innerText = "身分: " + u.toUpperCase();
 
         if (u === "manmei") {
           document.getElementById("adminPanel").style.display = "block";
@@ -203,7 +223,7 @@
         window.renderUI();
         if (window.syncFromFirebase) window.syncFromFirebase();
       } else {
-        alert("Invalid username! Please enter 'manmei' or 'yijun'.");
+        alert("帳號錯誤！管理員請輸入 'manmei'，使用者請輸入 'yijun'");
       }
     };
 
@@ -213,7 +233,7 @@
       document.getElementById("loginPwd").value = "";
       document.getElementById("bankDashboard").style.display = "none";
       document.getElementById("loginScreen").style.display = "block";
-      document.getElementById("navUserRole").innerText = "Please Login";
+      document.getElementById("navUserRole").innerText = "請先登入";
     };
   </script>
 
@@ -239,3 +259,53 @@
     window.syncFromFirebase = async function() {
       try {
         const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const d = snap.data();
+          window.bankData.bankName = d.bankName || window.bankData.bankName;
+          window.bankData.notice = d.notice || window.bankData.notice;
+          window.bankData.balance = d.balance !== undefined ? Number(d.balance) : window.bankData.balance;
+          window.bankData.history = d.history || window.bankData.history;
+          window.renderUI();
+        }
+      } catch (err) {
+        console.error("同步失敗:", err);
+      }
+    };
+
+    window.quickAction = async function(amount, reason) {
+      window.bankData.balance = Number(window.bankData.balance) + amount;
+      const today = new Date().toISOString().split('T')[0];
+      window.bankData.history.unshift({ desc: reason, amount: amount, date: today });
+      if (window.bankData.history.length > 15) window.bankData.history.pop();
+
+      window.renderUI();
+      try {
+        await setDoc(docRef, window.bankData);
+        alert("交易成功！【" + reason + "】 " + (amount > 0 ? "+" + amount : amount) + " 點");
+      } catch (e) {
+        alert("已更新本地，但雲端同步失敗");
+      }
+    };
+
+    window.saveData = async function() {
+      if (window.currentUser !== "manmei") {
+        alert("權限不足！只有管理員 'manmei' 可以修改設定。");
+        return;
+      }
+      window.bankData.bankName = document.getElementById("inputBankName").value;
+      window.bankData.notice = document.getElementById("inputNotice").value;
+      window.bankData.balance = Number(document.getElementById("inputBalance").value);
+
+      window.renderUI();
+      try {
+        await setDoc(docRef, window.bankData);
+        alert("後台設定已成功更新並同步至雲端！");
+      } catch (e) {
+        alert("更新失敗，請檢查網路連線");
+      }
+    };
+
+    window.syncFromFirebase();
+  </script>
+</body>
+</html>
