@@ -3,309 +3,477 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LUXURY COUPLE E-BANK</title>
+  <title>高級灰專屬數位網銀</title>
   <style>
     :root {
-      --bg-dark: #121212;
-      --card-bg: #1e1e1e;
-      --accent-gray: #888888;
-      --gold-color: #d4af37;
-      --text-main: #e0e0e0;
-      --text-sub: #aaaaaa;
+      --bg-page: #f2f3f5;
+      --surface: #ffffff;
+      --gray-dark: #2c2e33;
+      --gray-medium: #5a5e66;
+      --gray-light: #909399;
+      --accent-slate: #4a5568;
+      --border-line: #e4e7ed;
+      --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.04);
     }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-dark); margin: 0; padding: 0; color: var(--text-main); }
-    
-    /* 頂部質感導覽列 */
-    .navbar { background: #181818; border-bottom: 1px solid #333; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-    .nav-brand { font-weight: bold; font-size: 16px; color: var(--gold-color); letter-spacing: 1px; }
-    .nav-user { font-size: 12px; background: #2a2a2a; color: var(--gold-color); padding: 4px 12px; border-radius: 20px; border: 1px solid #444; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--gray-dark);
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
 
-    .container { max-width: 440px; margin: 0 auto; padding: 20px; }
-    
+    /* 頂部高級灰導覽列 */
+    .top-bar {
+      background-color: var(--surface);
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-line);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .top-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gray-dark);
+      letter-spacing: 0.5px;
+    }
+    .user-pill {
+      font-size: 12px;
+      background: #ebeef5;
+      color: var(--gray-medium);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .app-container {
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 16px 16px 60px 16px;
+    }
+
     /* 登入畫面 */
-    #loginScreen { background: var(--card-bg); border-radius: 16px; padding: 30px 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); text-align: center; margin-top: 40px; border: 1px solid #333; }
-    #loginScreen h2 { color: var(--gold-color); margin-bottom: 5px; font-size: 20px; }
-    #loginScreen p { color: var(--text-sub); font-size: 13px; margin-bottom: 25px; }
-    .login-input { width: 100%; padding: 12px; margin: 6px 0 16px 0; border-radius: 8px; border: 1px solid #444; background: #2a2a2a; color: white; box-sizing: border-box; font-size: 14px; text-align: center; }
-    .login-btn { background: var(--gold-color); color: #121212; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s; }
-    .login-btn:active { opacity: 0.8; }
+    #loginView {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 36px 24px;
+      margin-top: 40px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-line);
+    }
+    #loginView h2 {
+      margin: 0 0 6px 0;
+      font-size: 20px;
+      color: var(--gray-dark);
+      text-align: center;
+    }
+    #loginView p {
+      margin: 0 0 26px 0;
+      font-size: 13px;
+      color: var(--gray-light);
+      text-align: center;
+    }
+    .field-label {
+      display: block;
+      font-size: 12px;
+      color: var(--gray-medium);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .text-input {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border-line);
+      background: #f8f9fa;
+      color: var(--gray-dark);
+      font-size: 14px;
+      outline: none;
+    }
+    .text-input:focus {
+      border-color: var(--accent-slate);
+      background: #ffffff;
+    }
+    .btn-dark {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 10px;
+      background: var(--gray-dark);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-dark:active { opacity: 0.9; }
 
     /* 網銀主畫面 */
-    #bankDashboard { display: none; }
-    
-    /* 高級灰金尊爵卡片 */
-    .account-card { background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%); color: white; border-radius: 16px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); margin-bottom: 20px; border: 1px solid #444; position: relative; }
-    .card-type { font-size: 13px; color: var(--gold-color); letter-spacing: 1px; font-weight: bold; }
-    .card-number { font-size: 13px; letter-spacing: 2px; margin: 8px 0 20px 0; color: var(--text-sub); }
-    .balance-section { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; display: flex; justify-content: space-between; align-items: flex-end; }
-    .balance-title { font-size: 12px; color: var(--text-sub); }
-    .balance-val { font-size: 32px; font-weight: bold; color: #fff; }
+    #mainView { display: none; }
 
-    /* 公告欄 */
-    .notice-box { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border-left: 4px solid var(--gold-color); font-size: 13px; color: var(--text-sub); border: 1px solid #2a2a2a; }
-    .notice-box strong { color: var(--text-main); }
+    /* 頂部安全/公告提示橫幅 (仿玉山安全提示欄) */
+    .alert-banner {
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-line);
+    }
+    .alert-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #eef0f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .alert-content { flex: 1; }
+    .alert-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-dark);
+      margin-bottom: 2px;
+    }
+    .alert-sub {
+      font-size: 12px;
+      color: var(--gray-light);
+    }
 
-    /* 快捷功能方格 */
-    .menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-    .menu-item { background: var(--card-bg); border: 1px solid #2a2a2a; border-radius: 12px; padding: 14px 0; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
-    .menu-item:active { background: #2a2a2a; }
-    .menu-text { font-size: 11px; color: var(--text-main); }
+    /* 常用功能區塊 (4格白底圓角卡片) */
+    .section-heading {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-dark);
+      margin: 0 0 10px 2px;
+    }
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .quick-btn {
+      background: var(--surface);
+      border: 1px solid var(--border-line);
+      border-radius: 12px;
+      padding: 12px 4px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-dark);
+      box-shadow: var(--shadow-soft);
+      cursor: pointer;
+      text-align: center;
+    }
+    .quick-btn.active {
+      background: var(--gray-dark);
+      color: #ffffff;
+      border-color: var(--gray-dark);
+    }
 
-    /* 交易明細 */
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 5px; }
-    .section-title { font-size: 14px; font-weight: bold; color: var(--text-main); }
-    .tx-list { background: var(--card-bg); border-radius: 12px; padding: 5px 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); max-height: 220px; overflow-y: auto; border: 1px solid #2a2a2a; }
-    .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #2a2a2a; font-size: 13px; }
+    /* 分類頁籤列 (總覽 / 點數兌換 / 往來明細) */
+    .tab-bar {
+      display: flex;
+      gap: 18px;
+      border-bottom: 1px solid var(--border-line);
+      margin-bottom: 16px;
+      padding: 0 4px;
+      overflow-x: auto;
+    }
+    .tab-item {
+      padding: 8px 2px 10px 2px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-light);
+      cursor: pointer;
+      position: relative;
+      white-space: nowrap;
+    }
+    .tab-item.active {
+      color: var(--gray-dark);
+    }
+    .tab-item.active::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gray-dark);
+      border-radius: 3px;
+    }
+
+    /* 存款/點數概況大卡片 (仿玉山總覽卡片) */
+    .overview-card {
+      background: var(--surface);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-line);
+      margin-bottom: 18px;
+    }
+    .ov-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gray-dark);
+      margin-bottom: 16px;
+    }
+    .ov-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    /* 高級灰質感圓環 */
+    .donut-ring {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      border: 9px solid #dcdfe6;
+      border-top-color: #4a5568;
+      border-right-color: #718096;
+    }
+    .ov-total-box { text-align: right; }
+    .ov-unit-label {
+      font-size: 12px;
+      color: var(--gray-light);
+      margin-bottom: 4px;
+    }
+    .ov-total-num {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--gray-dark);
+      letter-spacing: -0.5px;
+    }
+
+    /* 細項清單 (仿臺幣綜存/定存列表) */
+    .sub-list {
+      border-top: 1px solid #f0f2f5;
+      padding-top: 12px;
+    }
+    .sub-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      font-size: 14px;
+    }
+    .sub-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--gray-medium);
+    }
+    .pill-bar {
+      width: 4px;
+      height: 14px;
+      border-radius: 2px;
+    }
+    .bar-1 { background: #2c2e33; }
+    .bar-2 { background: #718096; }
+    .bar-3 { background: #a0aec0; }
+    .sub-val {
+      font-weight: 600;
+      color: var(--gray-dark);
+    }
+    .ov-footer-btn {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-line);
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-slate);
+      cursor: pointer;
+    }
+
+    /* 點數兌換商城區塊 */
+    .redeem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .reward-card {
+      background: var(--surface);
+      border: 1px solid var(--border-line);
+      border-radius: 14px;
+      padding: 16px 14px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .reward-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-dark);
+      margin-bottom: 6px;
+    }
+    .reward-cost {
+      font-size: 13px;
+      color: var(--gray-medium);
+      margin-bottom: 14px;
+    }
+    .btn-redeem {
+      width: 100%;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      background: var(--gray-dark);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-redeem:disabled {
+      background: #dcdfe6;
+      color: #909399;
+      cursor: not-allowed;
+    }
+
+    /* 往來明細列表 */
+    .tx-card {
+      background: var(--surface);
+      border: 1px solid var(--border-line);
+      border-radius: 16px;
+      padding: 6px 16px;
+      box-shadow: var(--shadow-soft);
+    }
+    .tx-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 0;
+      border-bottom: 1px solid #f0f2f5;
+    }
     .tx-item:last-child { border-bottom: none; }
-    .tx-desc { font-weight: 500; color: var(--text-main); }
-    .tx-date { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
-    .tx-amount { font-weight: bold; font-size: 14px; }
-    .text-success { color: #4cd137; }
-    .text-danger { color: #ff5252; }
+    .tx-title { font-size: 14px; font-weight: 600; color: var(--gray-dark); }
+    .tx-date { font-size: 11px; color: var(--gray-light); margin-top: 3px; }
+    .tx-amt { font-size: 14px; font-weight: 700; }
+    .amt-in { color: #2b8a3e; }
+    .amt-out { color: #c92a2a; }
 
-    /* 管理員後台面板 */
-    .admin-panel { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-top: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.5); border: 1px solid #444; display: none; }
-    .admin-panel h3 { margin-top: 0; color: var(--gold-color); font-size: 15px; border-bottom: 1px solid #333; padding-bottom: 8px; }
-    label { font-size: 12px; color: var(--text-sub); font-weight: bold; display: block; margin-top: 12px; text-align: left; }
-    .admin-input { width: 100%; padding: 10px; margin-top: 4px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: white; box-sizing: border-box; font-size: 13px; }
-    .save-action-btn { background: var(--gold-color); color: #121212; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-    .logout-btn { background: #333; color: var(--text-sub); border: 1px solid #444; padding: 8px 16px; border-radius: 20px; font-size: 12px; cursor: pointer; float: right; margin-top: 20px; }
+    /* 管理員專屬後台 (僅 manmei 可見) */
+    .admin-section {
+      display: none;
+      background: var(--surface);
+      border: 1.5px solid var(--gray-dark);
+      border-radius: 18px;
+      padding: 20px;
+      margin-top: 24px;
+      box-shadow: var(--shadow-soft);
+    }
+    .admin-section h3 {
+      margin: 0 0 14px 0;
+      font-size: 15px;
+      color: var(--gray-dark);
+      border-bottom: 1px solid var(--border-line);
+      padding-bottom: 10px;
+    }
+    .admin-box {
+      background: #f8f9fa;
+      border: 1px solid var(--border-line);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+    .admin-box-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-dark);
+      margin-bottom: 10px;
+    }
+    .btn-outline {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--gray-dark);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--gray-dark);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .mini-del-btn {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+
+    .logout-area {
+      text-align: center;
+      margin-top: 26px;
+    }
+    .btn-logout {
+      background: transparent;
+      border: 1px solid #cfd3dc;
+      color: var(--gray-medium);
+      padding: 8px 24px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
-  <div class="navbar">
-    <div class="nav-brand"><span>LUXURY E-BANK</span></div>
-    <div class="nav-user" id="navUserRole">請先登入</div>
+  <div class="top-bar">
+    <div class="top-title" id="uiTopTitle">數位私人網銀</div>
+    <div class="user-pill" id="uiUserBadge">未登入</div>
   </div>
 
-  <div class="container">
-    
-    <!-- 登入畫面 (中文) -->
-    <div id="loginScreen">
-      <h2>情侶尊榮數位網銀</h2>
-      <p>請輸入您的專屬帳號與密碼</p>
+  <div class="app-container">
+
+    <!-- 登入畫面 -->
+    <div id="loginView">
+      <h2>數位網銀安全登入</h2>
+      <p>請輸入專屬帳號與密碼</p>
       
-      <label style="text-align:left;">帳號 (管理員: manmei / 使用者: yijun):</label>
-      <input type="text" id="loginUser" class="login-input" placeholder="請輸入帳號">
+      <label class="field-label">使用者帳號</label>
+      <input type="text" id="loginUser" class="text-input" placeholder="請輸入帳號">
       
-      <label style="text-align:left;">密碼 (預設: 1234):</label>
-      <input type="password" id="loginPwd" class="login-input" placeholder="請輸入密碼">
+      <label class="field-label">登入密碼</label>
+      <input type="password" id="loginPwd" class="text-input" placeholder="請輸入密碼">
       
-      <button type="button" class="login-btn" onclick="doLogin()">立即登入系統</button>
+      <button type="button" class="btn-dark" onclick="handleLogin()">登入網銀</button>
     </div>
 
-    <!-- 網銀主畫面 (高級灰風格 + 中文) -->
-    <div id="bankDashboard">
-      <div class="account-card">
-        <div class="card-type" id="displayBankName">愛情尊爵晶片帳戶</div>
-        <div class="card-number">NO. 5201 - 3140 - 520</div>
-        <div class="balance-section">
-          <div class="balance-title">目前可用愛情點數餘額</div>
-          <div><span class="balance-val" id="displayBalance">5,200</span> <span style="font-size:13px; color:var(--gold-color);">點</span></div>
+    <!-- 網銀主畫面 -->
+    <div id="mainView">
+
+      <!-- 頂部公告提示欄 (仿玉山橫幅) -->
+      <div class="alert-banner">
+        <div class="alert-icon">🔔</div>
+        <div class="alert-content">
+          <div class="alert-title" id="uiBannerTitle">請勿隨意將點數轉讓他人</div>
+          <div class="alert-sub" id="uiBannerSub">小心甜蜜詐騙以確保帳戶安全</div>
         </div>
       </div>
 
-      <div class="notice-box">
-        <strong>📢 銀行公告：</strong><br>
-        <span id="displayNotice">歡迎使用情侶專屬網銀，累積點數兌換甜蜜獎勵！</span>
-      </div>
-
-      <div class="menu-grid">
-        <button type="button" class="menu-item" onclick="quickAction(50, '乖乖聽話獎勵')">
-          <span style="font-size:20px;">💰</span>
-          <span class="menu-text">存入點數</span>
-        </button>
-        <button type="button" class="menu-item" onclick="quickAction(-20, '調皮搗蛋罰款')">
-          <span style="font-size:20px;">💸</span>
-          <span class="menu-text">扣除點數</span>
-        </button>
-        <button type="button" class="menu-item" onclick="alert('帳戶狀態：極度健康\n甜蜜報酬率：每天都想見你 100%')">
-          <span style="font-size:20px;">📊</span>
-          <span class="menu-text">帳務查詢</span>
-        </button>
-        <button type="button" class="menu-item" onclick="alert('安全提示：本行點數僅限兩人之間互寵、撒嬌與兌換願望使用！')">
-          <span style="font-size:20px;">🔒</span>
-          <span class="menu-text">安全聲明</span>
-        </button>
-      </div>
-
-      <div class="section-header">
-        <div class="section-title">近期交易明細紀錄</div>
-      </div>
-      <div class="tx-list" id="txList">
-        <div class="tx-item">載入明細中...</div>
-      </div>
-
-      <!-- 管理員專屬修改後台 (僅 manmei 登入可見) -->
-      <div id="adminPanel" class="admin-panel">
-        <h3>⚙️ 行員專屬管理後台 (僅 manmei 可修改)</h3>
-        
-        <label>修改網銀名稱：</label>
-        <input type="text" id="inputBankName" class="admin-input">
-        
-        <label>修改公告內容：</label>
-        <input type="text" id="inputNotice" class="admin-input">
-        
-        <label>直接修改總點數餘額：</label>
-        <input type="number" id="inputBalance" class="admin-input">
-        
-        <button type="button" class="save-action-btn" onclick="saveData()">確認儲存並同步至雲端</button>
-      </div>
-
-      <button type="button" class="logout-btn" onclick="doLogout()">登出系統</button>
-      <div style="clear:both;"></div>
-    </div>
-
-  </div>
-
-  <!-- 登入控制腳本 -->
-  <script>
-    window.currentUser = "";
-    window.bankData = {
-      bankName: "愛情尊爵晶片帳戶",
-      notice: "歡迎使用情侶專屬網銀，累積點數兌換甜蜜獎勵！",
-      balance: 5200,
-      history: [{ desc: "開戶首刷禮金", amount: 5200, date: "2026-11-18" }]
-    };
-
-    window.renderUI = function() {
-      document.getElementById("displayBankName").innerText = window.bankData.bankName;
-      document.getElementById("displayNotice").innerText = window.bankData.notice;
-      document.getElementById("displayBalance").innerText = Number(window.bankData.balance).toLocaleString();
-
-      document.getElementById("inputBankName").value = window.bankData.bankName;
-      document.getElementById("inputNotice").value = window.bankData.notice;
-      document.getElementById("inputBalance").value = window.bankData.balance;
-
-      const listEl = document.getElementById("txList");
-      listEl.innerHTML = "";
-      if (window.bankData.history && window.bankData.history.length > 0) {
-        window.bankData.history.forEach(item => {
-          const isPlus = item.amount >= 0;
-          listEl.innerHTML += `
-            <div class="tx-item">
-              <div>
-                <div class="tx-desc">${item.desc}</div>
-                <div class="tx-date">${item.date}</div>
-              </div>
-              <div class="tx-amount ${isPlus ? 'text-success' : 'text-danger'}">
-                ${isPlus ? '+' : ''}${Number(item.amount).toLocaleString()} 點
-              </div>
-            </div>
-          `;
-        });
-      } else {
-        listEl.innerHTML = `<div class="tx-item">尚無交易紀錄</div>`;
-      }
-    };
-
-    window.doLogin = function() {
-      const u = document.getElementById("loginUser").value.trim().toLowerCase();
-      const p = document.getElementById("loginPwd").value.trim();
-
-      if (p !== "1234") {
-        alert("密碼錯誤！預設密碼為 1234");
-        return;
-      }
-
-      if (u === "manmei" || u === "yijun") {
-        window.currentUser = u;
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("bankDashboard").style.display = "block";
-        document.getElementById("navUserRole").innerText = "身分: " + u.toUpperCase();
-
-        if (u === "manmei") {
-          document.getElementById("adminPanel").style.display = "block";
-        } else {
-          document.getElementById("adminPanel").style.display = "none";
-        }
-        window.renderUI();
-        if (window.syncFromFirebase) window.syncFromFirebase();
-      } else {
-        alert("帳號錯誤！管理員請輸入 'manmei'，使用者請輸入 'yijun'");
-      }
-    };
-
-    window.doLogout = function() {
-      window.currentUser = "";
-      document.getElementById("loginUser").value = "";
-      document.getElementById("loginPwd").value = "";
-      document.getElementById("bankDashboard").style.display = "none";
-      document.getElementById("loginScreen").style.display = "block";
-      document.getElementById("navUserRole").innerText = "請先登入";
-    };
-  </script>
-
-  <!-- Firebase 雲端同步模組 -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCE6LFg6mtPocWoYC1ez_g5soYmp52z-rI",
-      authDomain: "yi-jun.firebaseapp.com",
-      projectId: "yi-jun",
-      storageBucket: "yi-jun.firebasestorage.app",
-      messagingSenderId: "347261805032",
-      appId: "1:347261805032:web:6392b57aea77de0ce0c45d",
-      measurementId: "G-76CJTSHNQF"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const docRef = doc(db, "settings", "config");
-
-    window.syncFromFirebase = async function() {
-      try {
-        const snap = await getDoc(docRef);
-        if (snap.exists()) {
-          const d = snap.data();
-          window.bankData.bankName = d.bankName || window.bankData.bankName;
-          window.bankData.notice = d.notice || window.bankData.notice;
-          window.bankData.balance = d.balance !== undefined ? Number(d.balance) : window.bankData.balance;
-          window.bankData.history = d.history || window.bankData.history;
-          window.renderUI();
-        }
-      } catch (err) {
-        console.error("同步失敗:", err);
-      }
-    };
-
-    window.quickAction = async function(amount, reason) {
-      window.bankData.balance = Number(window.bankData.balance) + amount;
-      const today = new Date().toISOString().split('T')[0];
-      window.bankData.history.unshift({ desc: reason, amount: amount, date: today });
-      if (window.bankData.history.length > 15) window.bankData.history.pop();
-
-      window.renderUI();
-      try {
-        await setDoc(docRef, window.bankData);
-        alert("交易成功！【" + reason + "】 " + (amount > 0 ? "+" + amount : amount) + " 點");
-      } catch (e) {
-        alert("已更新本地，但雲端同步失敗");
-      }
-    };
-
-    window.saveData = async function() {
-      if (window.currentUser !== "manmei") {
-        alert("權限不足！只有管理員 'manmei' 可以修改設定。");
-        return;
-      }
-      window.bankData.bankName = document.getElementById("inputBankName").value;
-      window.bankData.notice = document.getElementById("inputNotice").value;
-      window.bankData.balance = Number(document.getElementById("inputBalance").value);
-
-      window.renderUI();
-      try {
-        await setDoc(docRef, window.bankData);
-        alert("後台設定已成功更新並同步至雲端！");
-      } catch (e) {
-        alert("更新失敗，請檢查網路連線");
-      }
-    };
-
-    window.syncFromFirebase();
-  </script>
-</body>
-</html>
+      <!-- 常用功能快捷列 -->
+      <div class="section-heading">常用功能</div>
+      <div class="quick-grid">
+        <button type="button" class="quick-btn active" id="qBtnOverview" onclick="switchTab('overview')">點數總覽</button>
+        <button type="button" class="quick-btn" id="qBtnRedeem" onclick="switchTab('redeem')">兌換獎勵</button>
+        <button type="button" class="quick-btn" id="qBtnHistory" onclick="switchTab('
