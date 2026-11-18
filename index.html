@@ -73,7 +73,7 @@
         <button type="button" class="quick-btn active" id="q1">存款總覽</button>
         <button type="button" class="quick-btn" id="q2">兌換獎勵</button>
         <button type="button" class="quick-btn" id="q4">每日抽獎</button>
-        <button type="button" class="quick-btn" id="qSupport">专属客服</button>
+        <button type="button" class="quick-btn" id="qSupport">專屬客服</button>
       </div>
 
       <div class="tabs">
@@ -83,12 +83,8 @@
         <div class="tab" id="t3">往來明細</div>
       </div>
 
-      <!-- 1. 存款總覽 (已加入 2023.09.05 與 愛心) -->
       <div id="p1" class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-          <div style="font-weight:700; font-size:15px;">存款概況</div>
-          <div style="font-size:12px; font-weight:600; color:#e0245e; background:#fff0f3; padding:4px 10px; border-radius:20px; border:1px solid #ffd6e0;">2023.09.05 ❤️</div>
-        </div>
+        <div style="font-weight:700; font-size:15px; margin-bottom:18px;">存款概況</div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:22px;">
           <div style="width:68px; height:68px; border-radius:50%; border:9px solid #e5e6eb; border-top-color:#4e5969; border-right-color:#86909c;"></div>
           <div style="text-align:right;">
@@ -112,7 +108,7 @@
         <div class="card" style="padding:6px 16px;"><div id="uiHistory"></div></div>
       </div>
 
-      <!-- 每日抽獎專區 -->
+      <!-- 每日抽獎專區 (10 ~ 100元隨機) -->
       <div id="p4" class="card" style="display:none; text-align:center;">
         <div style="font-weight:700; font-size:16px; margin-bottom:4px;">每日幸運大抽獎</div>
         <div style="font-size:12px; color:#86909c;">每日可免費抽獎一次，隨機獲得新台幣 10 ~ 100 元</div>
@@ -172,7 +168,7 @@
       phone: "0903122912",
       notice1: "請勿依他人指示操作轉帳",
       notice2: "小心甜蜜詐騙以確保帳戶資金安全",
-      bal: 13297,
+      bal: 13140,
       lastSpinDate: "",
       rewards: [
         { name: "指定大餐一頓$1000", cost: 1500 },
@@ -188,12 +184,12 @@
     };
 
     try {
-      var local = localStorage.getItem("yijun_bank_final_v5");
+      var local = localStorage.getItem("yijun_bank_final_v4");
       if (local) dbData = JSON.parse(local);
     } catch (e) {}
 
     function persist() {
-      try { localStorage.setItem("yijun_bank_final_v5", JSON.stringify(dbData)); } catch (e) {}
+      try { localStorage.setItem("yijun_bank_final_v4", JSON.stringify(dbData)); } catch (e) {}
     }
 
     function getToday() {
@@ -318,4 +314,120 @@
 
     window.addEventListener("DOMContentLoaded", function() {
       document.getElementById("loginBtn").onclick = function() {
-        var u = document.getElementById("inUser").value.
+        var u = document.getElementById("inUser").value.trim().toLowerCase();
+        var p = document.getElementById("inPwd").value.trim();
+        
+        if (u === "manmei" && p === "0427") {
+          curUser = "manmei";
+          document.getElementById("uiRole").innerText = "管理員：MANMEI";
+          document.getElementById("adminBox").style.display = "block";
+        } else if (u === "yijun" && p === "0617") {
+          curUser = "yijun";
+          document.getElementById("uiRole").innerText = "使用者：YIJUN";
+          document.getElementById("adminBox").style.display = "none";
+        } else {
+          alert("帳號或密碼錯誤！");
+          return;
+        }
+
+        document.getElementById("viewLogin").style.display = "none";
+        document.getElementById("viewMain").style.display = "block";
+        goTab(1);
+        render();
+      };
+
+      document.getElementById("logoutBtn").onclick = function() {
+        curUser = "";
+        document.getElementById("inUser").value = "";
+        document.getElementById("inPwd").value = "";
+        document.getElementById("viewMain").style.display = "none";
+        document.getElementById("viewLogin").style.display = "block";
+        document.getElementById("uiRole").innerText = "未登入";
+      };
+
+      document.getElementById("q1").onclick = function() { goTab(1); };
+      document.getElementById("q2").onclick = function() { goTab(2); };
+      document.getElementById("q4").onclick = function() { goTab(4); };
+      document.getElementById("t1").onclick = function() { goTab(1); };
+      document.getElementById("t2").onclick = function() { goTab(2); };
+      document.getElementById("t3").onclick = function() { goTab(3); };
+      document.getElementById("t4").onclick = function() { goTab(4); };
+      document.getElementById("qSupport").onclick = showSupport;
+
+      document.getElementById("btnSpin").onclick = function() {
+        if (isSpinning || dbData.lastSpinDate === getToday()) return;
+        isSpinning = true;
+        var btn = document.getElementById("btnSpin");
+        btn.disabled = true;
+        btn.innerText = "轉盤旋轉中...";
+        
+        var prize = Math.floor(Math.random() * (100 - 10 + 1)) + 10;
+        wheelDeg += 1800 + (prize * 3.6);
+        document.getElementById("wheelCircle").style.transform = "rotate(" + wheelDeg + "deg)";
+        
+        setTimeout(function() {
+          isSpinning = false;
+          dbData.lastSpinDate = getToday();
+          dbData.bal = Number(dbData.bal) + prize;
+          dbData.history.unshift({ desc: "每日幸運大抽獎獎金", amt: prize, date: getToday() });
+          persist(); // 立即永久儲存餘額與明細
+          render();   // 即時重新渲染畫面更新總金額
+          alert("🎉 恭喜抽中每日紅包：新台幣 " + prize + " 元！\n已自動存入您的帳戶餘額。");
+        }, 3100);
+      };
+
+      document.getElementById("addTxBtn").onclick = function() {
+        var desc = document.getElementById("aDesc").value.trim();
+        var amt = Number(document.getElementById("aAmt").value);
+        if (!desc || isNaN(amt) || amt === 0) return;
+        dbData.bal = Number(dbData.bal) + amt;
+        dbData.history.unshift({ desc: desc, amt: amt, date: getToday() });
+        persist();
+        render();
+        alert("已新增明細並更新餘額！");
+      };
+
+      document.getElementById("addRewardBtn").onclick = function() {
+        var name = document.getElementById("aRName").value.trim();
+        var cost = Number(document.getElementById("aRCost").value);
+        if (!name || isNaN(cost) || cost <= 0) return;
+        dbData.rewards.push({ name: name, cost: cost });
+        persist();
+        render();
+        alert("已上架新獎勵！");
+      };
+
+      document.getElementById("saveRewardsBtn").onclick = function() {
+        var up = [];
+        for (var k = 0; k < dbData.rewards.length; k++) {
+          var n = document.getElementById("eName_" + k).value.trim();
+          var c = Number(document.getElementById("eCost_" + k).value);
+          if (n && !isNaN(c) && c > 0) up.push({ name: n, cost: c });
+        }
+        dbData.rewards = up;
+        persist();
+        render();
+        alert("獎勵名稱與金額已儲存！");
+      };
+
+      document.getElementById("saveSettingsBtn").onclick = function() {
+        dbData.title = document.getElementById("aTitle").value;
+        dbData.phone = document.getElementById("aPhone").value;
+        dbData.notice1 = document.getElementById("aNotice1").value;
+        dbData.notice2 = document.getElementById("aNotice2").value;
+        dbData.bal = Number(document.getElementById("aNewBal").value);
+        persist();
+        render();
+        alert("修改已儲存！");
+      };
+
+      document.getElementById("resetSpinBtn").onclick = function() {
+        dbData.lastSpinDate = "";
+        persist();
+        render();
+        alert("已重置今日抽獎次數！");
+      };
+    });
+  </script>
+</body>
+</html>
