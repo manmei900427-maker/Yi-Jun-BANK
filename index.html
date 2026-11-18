@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Love Bank</title>
+  <style>
+    body { font-family: sans-serif; background: #fff0f3; margin: 0; padding: 20px; color: #333; }
+    .card { background: white; max-width: 400px; margin: 0 auto; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; }
+    h1 { color: #ff4d6d; font-size: 22px; text-align: center; }
+    .balance { background: #ffccd5; padding: 15px; border-radius: 12px; text-align: center; margin: 15px 0; }
+    .balance span { font-size: 28px; font-weight: bold; color: #c9184a; }
+    .notice { background: #f8f9fa; padding: 10px; border-radius: 8px; font-size: 14px; color: #555; }
+    #adminPanel { display: none; margin-top: 20px; border-top: 2px dashed #ff4d6d; padding-top: 15px; }
+    input, button { width: 100%; padding: 10px; margin: 6px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+    button { background: #ff4d6d; color: white; border: none; font-weight: bold; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h1 id="displayBankName">Loading...</h1>
+  <img id="displayBanner" src="" alt="Banner">
+  
+  <div class="balance">
+    <div>Current Points</div>
+    <span id="displayBalance">0</span> pts
+  </div>
+
+  <div class="notice" id="displayNotice">Loading notice...</div>
+  
+  <button onclick="toggleAdmin()" style="background:#888; margin-top:20px;">Admin Login</button>
+
+  <div id="adminPanel">
+    <h3>Admin Settings</h3>
+    <label>Bank Name:</label>
+    <input type="text" id="inputBankName">
+    <label>Banner Image URL:</label>
+    <input type="text" id="inputBannerUrl">
+    <label>Notice text:</label>
+    <input type="text" id="inputNotice">
+    <label>Points Balance:</label>
+    <input type="number" id="inputBalance">
+    <button onclick="saveData()">Save and Update</button>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCE6LFg6mtPocWoYC1ez_g5soYmp52z-rI",
+    authDomain: "yi-jun.firebaseapp.com",
+    projectId: "yi-jun",
+    storageBucket: "yi-jun.firebasestorage.app",
+    messagingSenderId: "347261805032",
+    appId: "1:347261805032:web:6392b57aea77de0ce0c45d",
+    measurementId: "G-76CJTSHNQF"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const docRef = doc(db, "settings", "config");
+
+  async function loadData() {
+    try {
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        document.getElementById("displayBankName").innerText = data.bankName || "Love Bank";
+        document.getElementById("displayBanner").src = data.bannerUrl || "https://images.unsplash.com/photo-1518199266791-5375a83190b7";
+        document.getElementById("displayNotice").innerText = data.notice || "";
+        document.getElementById("displayBalance").innerText = data.balance || 0;
+
+        document.getElementById("inputBankName").value = data.bankName || "";
+        document.getElementById("inputBannerUrl").value = data.bannerUrl || "";
+        document.getElementById("inputNotice").value = data.notice || "";
+        document.getElementById("inputBalance").value = data.balance || 0;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  window.toggleAdmin = function() {
+    const pwd = prompt("Enter admin password:");
+    if (pwd === "1234") {
+      const panel = document.getElementById("adminPanel");
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
+    } else if (pwd !== null) {
+      alert("Wrong password!");
+    }
+  };
+
+  window.saveData = async function() {
+    await setDoc(docRef, {
+      bankName: document.getElementById("inputBankName").value,
+      bannerUrl: document.getElementById("inputBannerUrl").value,
+      notice: document.getElementById("inputNotice").value,
+      balance: Number(document.getElementById("inputBalance").value)
+    });
+    alert("Updated successfully!");
+    loadData();
+  };
+
+  loadData();
+</script>
+</body>
+</html>
