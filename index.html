@@ -73,7 +73,7 @@
       <label style="text-align:left;">Password (1234):</label>
       <input type="password" id="loginPwd" class="login-input" placeholder="Enter password">
       
-      <button class="login-btn" onclick="handleLogin()">Login System</button>
+      <button type="button" class="login-btn" onclick="doLogin()">Login System</button>
     </div>
 
     <!-- 網銀主畫面 -->
@@ -93,19 +93,19 @@
       </div>
 
       <div class="menu-grid">
-        <button class="menu-item" onclick="quickAction(50, 'Daily Reward')">
+        <button type="button" class="menu-item" onclick="quickAction(50, 'Daily Reward')">
           <span style="font-size:20px;">💰</span>
           <span style="font-size:11px;">Reward</span>
         </button>
-        <button class="menu-item" onclick="quickAction(-20, 'Expense Deduction')">
+        <button type="button" class="menu-item" onclick="quickAction(-20, 'Expense Deduction')">
           <span style="font-size:20px;">💸</span>
           <span style="font-size:11px;">Deduct</span>
         </button>
-        <button class="menu-item" onclick="alert('Account Status: Excellent\nSweetness Rate: 100%')">
+        <button type="button" class="menu-item" onclick="alert('Account Status: Excellent\nSweetness Rate: 100%')">
           <span style="font-size:20px;">📊</span>
           <span style="font-size:11px;">Status</span>
         </button>
-        <button class="menu-item" onclick="alert('Security: Protected by couple love encryption.')">
+        <button type="button" class="menu-item" onclick="alert('Security: Protected by couple love encryption.')">
           <span style="font-size:20px;">🔒</span>
           <span style="font-size:11px;">Security</span>
         </button>
@@ -130,15 +130,94 @@
         <label>Total Balance:</label>
         <input type="number" id="inputBalance" class="admin-input">
         
-        <button class="save-action-btn" onclick="saveData()">Save Changes to Cloud</button>
+        <button type="button" class="save-action-btn" onclick="saveData()">Save Changes to Cloud</button>
       </div>
 
-      <button class="logout-btn" onclick="handleLogout()">Logout</button>
+      <button type="button" class="logout-btn" onclick="doLogout()">Logout</button>
       <div style="clear:both;"></div>
     </div>
 
   </div>
 
+  <!-- 獨立的登入控制腳本，確保按鈕秒反應 -->
+  <script>
+    window.currentUser = "";
+    window.bankData = {
+      bankName: "Esun Couple Account",
+      notice: "Welcome to couple banking. Accumulate love points everyday!",
+      balance: 5200,
+      history: [{ desc: "Initial Deposit", amount: 5200, date: "2026-11-18" }]
+    };
+
+    window.renderUI = function() {
+      document.getElementById("displayBankName").innerText = window.bankData.bankName;
+      document.getElementById("displayNotice").innerText = window.bankData.notice;
+      document.getElementById("displayBalance").innerText = Number(window.bankData.balance).toLocaleString();
+
+      document.getElementById("inputBankName").value = window.bankData.bankName;
+      document.getElementById("inputNotice").value = window.bankData.notice;
+      document.getElementById("inputBalance").value = window.bankData.balance;
+
+      const listEl = document.getElementById("txList");
+      listEl.innerHTML = "";
+      if (window.bankData.history && window.bankData.history.length > 0) {
+        window.bankData.history.forEach(item => {
+          const isPlus = item.amount >= 0;
+          listEl.innerHTML += `
+            <div class="tx-item">
+              <div>
+                <div class="tx-desc">${item.desc}</div>
+                <div class="tx-date">${item.date}</div>
+              </div>
+              <div class="tx-amount ${isPlus ? 'text-success' : 'text-danger'}">
+                ${isPlus ? '+' : ''}${Number(item.amount).toLocaleString()} pts
+              </div>
+            </div>
+          `;
+        });
+      } else {
+        listEl.innerHTML = `<div class="tx-item">No transactions yet</div>`;
+      }
+    };
+
+    window.doLogin = function() {
+      const u = document.getElementById("loginUser").value.trim().toLowerCase();
+      const p = document.getElementById("loginPwd").value.trim();
+
+      if (p !== "1234") {
+        alert("Wrong password! Please enter 1234.");
+        return;
+      }
+
+      if (u === "manmei" || u === "yijun") {
+        window.currentUser = u;
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("bankDashboard").style.display = "block";
+        document.getElementById("navUserRole").innerText = "Role: " + u.toUpperCase();
+
+        if (u === "manmei") {
+          document.getElementById("adminPanel").style.display = "block";
+        } else {
+          document.getElementById("adminPanel").style.display = "none";
+        }
+        window.renderUI();
+        if (window.syncFromFirebase) window.syncFromFirebase();
+      } else {
+        alert("Invalid username! Please enter 'manmei' or 'yijun'.");
+      }
+    };
+
+    window.doLogout = function() {
+      window.currentUser = "";
+      document.getElementById("loginUser").value = "";
+      document.getElementById("loginPwd").value = "";
+      document.getElementById("bankDashboard").style.display = "none";
+      document.getElementById("loginScreen").style.display = "block";
+      document.getElementById("navUserRole").innerText = "Please Login";
+    };
+  </script>
+
+  <!-- Firebase 雲端同步模組 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -157,45 +236,6 @@
     const db = getFirestore(app);
     const docRef = doc(db, "settings", "config");
 
-    let currentUser = "";
-    let bankData = {
-      bankName: "Esun Couple Account",
-      notice: "Welcome to couple banking. Accumulate love points everyday!",
-      balance: 5200,
-      history: [{ desc: "Initial Deposit", amount: 5200, date: "2026-11-18" }]
-    };
-
-    async function fetchData() {
+    window.syncFromFirebase = async function() {
       try {
         const snap = await getDoc(docRef);
-        if (snap.exists()) {
-          const d = snap.data();
-          bankData.bankName = d.bankName || bankData.bankName;
-          bankData.notice = d.notice || bankData.notice;
-          bankData.balance = d.balance !== undefined ? Number(d.balance) : bankData.balance;
-          bankData.history = d.history || bankData.history;
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    function renderUI() {
-      document.getElementById("displayBankName").innerText = bankData.bankName;
-      document.getElementById("displayNotice").innerText = bankData.notice;
-      document.getElementById("displayBalance").innerText = bankData.balance.toLocaleString();
-
-      document.getElementById("inputBankName").value = bankData.bankName;
-      document.getElementById("inputNotice").value = bankData.notice;
-      document.getElementById("inputBalance").value = bankData.balance;
-
-      const listEl = document.getElementById("txList");
-      listEl.innerHTML = "";
-      if (bankData.history && bankData.history.length > 0) {
-        bankData.history.forEach(item => {
-          const isPlus = item.amount >= 0;
-          listEl.innerHTML += `
-            <div class="tx-item">
-              <div>
-                <div class="tx-desc">${item.desc}</div>
-                <div class="tx-date">${item
