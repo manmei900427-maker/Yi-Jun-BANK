@@ -39,6 +39,12 @@
       transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
     }
     .wheel-center { width: 62px; height: 62px; border-radius: 50%; background: #1f2329; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-align: center; }
+    .log-item { border: 1px solid #e5e6eb; background: #f9fafb; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+    .log-item:last-child { margin-bottom: 0; }
+    .log-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #e5e6eb; }
+    .log-date { font-weight: 700; font-size: 14px; color: #1f2329; }
+    .log-bal { font-weight: 700; font-size: 13px; color: #1f2329; background: #ffffff; padding: 3px 10px; border-radius: 20px; border: 1px solid #e5e6eb; }
+    .log-tx { font-size: 12px; color: #4e5969; padding: 4px 0; display: flex; justify-content: space-between; gap: 8px; }
   </style>
 </head>
 <body>
@@ -83,9 +89,10 @@
         <div class="tab" id="t2">兌換獎勵</div>
         <div class="tab" id="t4">每日抽獎</div>
         <div class="tab" id="t3">往來明細</div>
+        <div class="tab" id="t5">每日記錄簿</div>
       </div>
 
-      <!-- 1. 存款總覽 (附帶 2023.09.05 ❤️) -->
+      <!-- 1. 存款總覽 -->
       <div id="p1" class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
           <div style="font-weight:700; font-size:15px;">存款概況</div>
@@ -116,7 +123,7 @@
         <div class="card" style="padding:6px 16px;"><div id="uiHistory"></div></div>
       </div>
 
-      <!-- 4. 每日抽獎 (10 ~ 100元隨機) -->
+      <!-- 4. 每日抽獎 -->
       <div id="p4" class="card" style="display:none; text-align:center;">
         <div style="font-weight:700; font-size:16px; margin-bottom:4px;">每日幸運大抽獎</div>
         <div style="font-size:12px; color:#86909c;">每日可免費抽獎一次，隨機獲得新台幣 10 ~ 100 元</div>
@@ -126,6 +133,16 @@
         </div>
         <div id="spinStatusText" style="font-size:13px; font-weight:600; color:#4e5969; margin-bottom:14px;">今日尚未抽獎</div>
         <button type="button" class="btn" id="btnSpin">立即抽獎拿紅包</button>
+      </div>
+
+      <!-- 5. 每日餘額跟明細自動記錄簿 -->
+      <div id="p5" class="card" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <div style="font-weight:700; font-size:15px;">每日餘額與明細自動記錄簿</div>
+          <span style="font-size:11px; color:#4e5969; background:#f4f5f7; padding:3px 9px; border-radius:20px;">自動永久保存</span>
+        </div>
+        <div style="font-size:12px; color:#86909c; margin-bottom:16px;">每次登入與每次帳戶異動皆會自動留存當日餘額及明細，不會遺失。</div>
+        <div id="uiDailyJournal"></div>
       </div>
 
       <!-- 管理員控制中心 -->
@@ -177,7 +194,7 @@
       phone: "0903122912",
       notice1: "請勿依他人指示操作轉帳",
       notice2: "小心甜蜜詐騙以確保帳戶資金安全",
-      bal: 13297,
+      bal: 13140,
       lastSpinDate: "",
       rewards: [
         { name: "指定大餐一頓$1000", cost: 1500 },
@@ -189,21 +206,72 @@
         { name: "免費晚餐券", cost: 1500 },
         { name: "外送券", cost: 500 }
       ],
-      history: [{ desc: "開戶尊榮禮金", amt: 13140, date: "2026-11-18" }]
+      history: [{ desc: "開戶尊榮禮金", amt: 13140, date: "2026-11-18" }],
+      dailyJournal: []
     };
 
     try {
-      var local = localStorage.getItem("yijun_bank_final_v6");
-      if (local) dbData = JSON.parse(local);
+      var local = localStorage.getItem("yijun_bank_final_v11");
+      if (local) {
+        var parsed = JSON.parse(local);
+        dbData = Object.assign({}, dbData, parsed);
+        if (!Array.isArray(dbData.dailyJournal)) dbData.dailyJournal = [];
+      }
     } catch (e) {}
-
-    function persist() {
-      try { localStorage.setItem("yijun_bank_final_v6", JSON.stringify(dbData)); } catch (e) {}
-    }
 
     function getToday() {
       var d = new Date();
       return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+    }
+
+    function getNowTime() {
+      var d = new Date();
+      return String(d.getHours()).padStart(2, '0') + ":" + String(d.getMinutes()).padStart(2, '0');
+    }
+
+    // 每日餘額與明細自動記錄簿：每次登入或異動都自動同步當日快照
+    function recordDailySnapshot(reasonText) {
+      var today = getToday();
+      var nowTime = getNowTime();
+      var currentBal = Number(dbData.bal) || 0;
+      var todayTx = dbData.history.filter(function(item) {
+        return item.date === today;
+      });
+
+      var idx = -1;
+      for (var i = 0; i < dbData.dailyJournal.length; i++) {
+        if (dbData.dailyJournal[i].date === today) {
+          idx = i;
+          break;
+        }
+      }
+
+      var snapshot = {
+        date: today,
+        updatedAt: nowTime,
+        balance: currentBal,
+        lastNote: reasonText || "登入自動記錄",
+        transactions: todayTx.map(function(tx) {
+          return { desc: tx.desc, amt: Number(tx.amt), date: tx.date };
+        })
+      };
+
+      if (idx >= 0) {
+        dbData.dailyJournal[idx] = snapshot;
+      } else {
+        dbData.dailyJournal.unshift(snapshot);
+      }
+
+      dbData.dailyJournal.sort(function(a, b) {
+        return b.date.localeCompare(a.date);
+      });
+    }
+
+    function persist(reasonText) {
+      recordDailySnapshot(reasonText);
+      try {
+        localStorage.setItem("yijun_bank_final_v11", JSON.stringify(dbData));
+      } catch (e) {}
     }
 
     function showSupport() {
@@ -215,10 +283,12 @@
       document.getElementById("p2").style.display = (n === 2) ? "block" : "none";
       document.getElementById("p3").style.display = (n === 3) ? "block" : "none";
       document.getElementById("p4").style.display = (n === 4) ? "block" : "none";
+      document.getElementById("p5").style.display = (n === 5) ? "block" : "none";
       document.getElementById("t1").className = (n === 1) ? "tab active" : "tab";
       document.getElementById("t2").className = (n === 2) ? "tab active" : "tab";
       document.getElementById("t3").className = (n === 3) ? "tab active" : "tab";
       document.getElementById("t4").className = (n === 4) ? "tab active" : "tab";
+      document.getElementById("t5").className = (n === 5) ? "tab active" : "tab";
       document.getElementById("q1").className = (n === 1) ? "quick-btn active" : "quick-btn";
       document.getElementById("q2").className = (n === 2) ? "quick-btn active" : "quick-btn";
       document.getElementById("q4").className = (n === 4) ? "quick-btn active" : "quick-btn";
@@ -244,7 +314,7 @@
 
       var rGrid = document.getElementById("uiRewards");
       rGrid.innerHTML = "";
-      dbData.rewards.forEach(function(r, idx) {
+      dbData.rewards.forEach(function(r) {
         var ok = Number(dbData.bal) >= Number(r.cost);
         var card = document.createElement("div");
         card.className = "card";
@@ -260,7 +330,7 @@
           if (!confirm("確定花費新台幣 " + r.cost + " 元兌換「" + r.name + "」？")) return;
           dbData.bal = Number(dbData.bal) - Number(r.cost);
           dbData.history.unshift({ desc: "兌換獎勵：" + r.name, amt: -Number(r.cost), date: getToday() });
-          persist();
+          persist("兌換獎勵：" + r.name);
           render();
           alert("兌換成功！請截圖向管理員領取。");
         };
@@ -287,7 +357,7 @@
           del.innerText = "刪";
           del.onclick = function() {
             dbData.rewards.splice(k, 1);
-            persist();
+            persist("管理員刪除獎勵");
             render();
           };
           row.appendChild(del);
@@ -311,7 +381,7 @@
           dBtn.innerText = "刪";
           dBtn.onclick = function() {
             dbData.history.splice(j, 1);
-            persist();
+            persist("管理員刪除明細");
             render();
           };
           right.appendChild(dBtn);
@@ -319,6 +389,47 @@
         row.appendChild(right);
         hBox.appendChild(row);
       });
+
+      // 渲染每日餘額與明細自動記錄簿
+      var jBox = document.getElementById("uiDailyJournal");
+      if (jBox) {
+        jBox.innerHTML = "";
+        if (!dbData.dailyJournal || dbData.dailyJournal.length === 0) {
+          jBox.innerHTML = '<div style="text-align:center; color:#86909c; font-size:13px; padding:16px 0;">尚無每日記錄</div>';
+        } else {
+          dbData.dailyJournal.forEach(function(entry) {
+            var item = document.createElement("div");
+            item.className = "log-item";
+
+            var head = document.createElement("div");
+            head.className = "log-head";
+            head.innerHTML = '<div class="log-date">📅 ' + entry.date + ' <span style="font-size:11px; color:#86909c; font-weight:400;">(' + (entry.updatedAt || '') + ')</span></div><div class="log-bal">餘額 NT$ ' + Number(entry.balance).toLocaleString() + '</div>';
+            item.appendChild(head);
+
+            var noteDiv = document.createElement("div");
+            noteDiv.style.cssText = "font-size:11px; color:#86909c; margin-bottom:6px;";
+            noteDiv.innerText = "最近記錄：" + (entry.lastNote || "登入自動記錄");
+            item.appendChild(noteDiv);
+
+            if (entry.transactions && entry.transactions.length > 0) {
+              entry.transactions.forEach(function(tx) {
+                var isPlus = Number(tx.amt) >= 0;
+                var txLine = document.createElement("div");
+                txLine.className = "log-tx";
+                txLine.innerHTML = '<span>• ' + tx.desc + '</span><span style="font-weight:600; color:' + (isPlus ? '#009a29' : '#cb2634') + ';">' + (isPlus ? '+' : '') + Number(tx.amt).toLocaleString() + ' 元</span>';
+                item.appendChild(txLine);
+              });
+            } else {
+              var emptyTx = document.createElement("div");
+              emptyTx.className = "log-tx";
+              emptyTx.innerHTML = '<span style="color:#86909c;">• 當日無新增收支明細（僅記錄餘額）</span><span></span>';
+              item.appendChild(emptyTx);
+            }
+
+            jBox.appendChild(item);
+          });
+        }
+      }
     }
 
     window.addEventListener("DOMContentLoaded", function() {
@@ -339,6 +450,8 @@
           return;
         }
 
+        // 每次登入都自動記錄當日餘額與明細
+        persist("登入自動記錄 (" + curUser.toUpperCase() + ")");
         document.getElementById("viewLogin").style.display = "none";
         document.getElementById("viewMain").style.display = "block";
         goTab(1);
@@ -346,6 +459,7 @@
       };
 
       document.getElementById("logoutBtn").onclick = function() {
+        persist("登出前自動記錄");
         curUser = "";
         document.getElementById("inUser").value = "";
         document.getElementById("inPwd").value = "";
@@ -361,6 +475,7 @@
       document.getElementById("t2").onclick = function() { goTab(2); };
       document.getElementById("t3").onclick = function() { goTab(3); };
       document.getElementById("t4").onclick = function() { goTab(4); };
+      document.getElementById("t5").onclick = function() { goTab(5); };
       document.getElementById("qSupport").onclick = showSupport;
 
       document.getElementById("btnSpin").onclick = function() {
@@ -379,64 +494,7 @@
           dbData.lastSpinDate = getToday();
           dbData.bal = Number(dbData.bal) + prize;
           dbData.history.unshift({ desc: "每日幸運大抽獎獎金", amt: prize, date: getToday() });
-          persist();
+          persist("每日抽獎 +" + prize + " 元");
           render();
-          alert("🎉 恭喜抽中每日紅包：新台幣 " + prize + " 元！\n已自動存入您的帳戶餘額。");
-        }, 3100);
-      };
-
-      document.getElementById("addTxBtn").onclick = function() {
-        var desc = document.getElementById("aDesc").value.trim();
-        var amt = Number(document.getElementById("aAmt").value);
-        if (!desc || isNaN(amt) || amt === 0) return;
-        dbData.bal = Number(dbData.bal) + amt;
-        dbData.history.unshift({ desc: desc, amt: amt, date: getToday() });
-        persist();
-        render();
-        alert("已新增明細並更新餘額！");
-      };
-
-      document.getElementById("addRewardBtn").onclick = function() {
-        var name = document.getElementById("aRName").value.trim();
-        var cost = Number(document.getElementById("aRCost").value);
-        if (!name || isNaN(cost) || cost <= 0) return;
-        dbData.rewards.push({ name: name, cost: cost });
-        persist();
-        render();
-        alert("已上架新獎勵！");
-      };
-
-      document.getElementById("saveRewardsBtn").onclick = function() {
-        var up = [];
-        for (var k = 0; k < dbData.rewards.length; k++) {
-          var n = document.getElementById("eName_" + k).value.trim();
-          var c = Number(document.getElementById("eCost_" + k).value);
-          if (n && !isNaN(c) && c > 0) up.push({ name: n, cost: c });
-        }
-        dbData.rewards = up;
-        persist();
-        render();
-        alert("獎勵名稱與金額已儲存！");
-      };
-
-      document.getElementById("saveSettingsBtn").onclick = function() {
-        dbData.title = document.getElementById("aTitle").value;
-        dbData.phone = document.getElementById("aPhone").value;
-        dbData.notice1 = document.getElementById("aNotice1").value;
-        dbData.notice2 = document.getElementById("aNotice2").value;
-        dbData.bal = Number(dbData.bal) + (Number(document.getElementById("aNewBal").value) - dbData.bal);
-        persist();
-        render();
-        alert("修改已儲存！");
-      };
-
-      document.getElementById("resetSpinBtn").onclick = function() {
-        dbData.lastSpinDate = "";
-        persist();
-        render();
-        alert("已重置今日抽獎次數！");
-      };
-    });
-  </script>
-</body>
-</html>
+          alert("🎉 恭喜抽中每日紅包：新台幣 " + prize + " 元！\n已自動存入您的帳戶餘額與每日記錄簿。");
+        },
