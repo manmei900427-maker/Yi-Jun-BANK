@@ -131,7 +131,7 @@
           <div class="wheel-pointer"></div>
           <div class="wheel-circle" id="wheelCircle"><div class="wheel-center">TWD<br>10~100元</div></div>
         </div>
-        <div id="spinStatusText" style="font-size:13px; font-weight:600; color:#4e5969; margin-bottom:14px;">今日尚未抽獎</div>
+        <div id="spinStatusText" style="font-size:13px; font-weight:600; color:#4e5969; margin-bottom:14px;">今日已抽獎 0 次</div>
         <button type="button" class="btn" id="btnSpin">立即抽獎拿紅包</button>
       </div>
 
@@ -153,7 +153,7 @@
           <div style="font-weight:700; font-size:13px; margin-bottom:8px;">1. 新增入帳 / 扣款明細 (TWD)</div>
           <input type="text" id="aDesc" placeholder="項目說明">
           <input type="number" id="aAmt" placeholder="金額 (存入正數，扣款負數)">
-          <button type="button" class="btn-outline" id="addTxBtn">確認新增明細並更新餘額</button>
+          <button type="button" class="btn-outline" id="addTxBtn">確認新增明細並自動更新餘額</button>
         </div>
 
         <div class="admin-sub">
@@ -168,14 +168,14 @@
         </div>
 
         <div class="admin-sub" style="margin-bottom:0;">
-          <div style="font-weight:700; font-size:13px; margin-bottom:8px;">3. 修改文字、客服電話與總餘額</div>
+          <div style="font-weight:700; font-size:13px; margin-bottom:8px;">3. 修改文字、客服電話與抽獎管理</div>
           <label>頂部網銀名稱</label><input type="text" id="aTitle">
           <label>專屬客服電話</label><input type="text" id="aPhone">
           <label>公告主標題</label><input type="text" id="aNotice1">
           <label>公告副標題</label><input type="text" id="aNotice2">
-          <label>總餘額 (新台幣 TWD)</label><input type="number" id="aNewBal">
+          <label>總餘額 (新台幣 TWD，隨明細自動計算)</label><input type="number" id="aNewBal">
           <button type="button" class="btn" style="margin-bottom:10px;" id="saveSettingsBtn">儲存文字與餘額修改</button>
-          <button type="button" class="btn-outline" id="resetSpinBtn">重置今日抽獎次數 (供測試)</button>
+          <button type="button" class="btn-outline" id="resetSpinBtn">歸零轉盤次數</button>
         </div>
       </div>
 
@@ -196,6 +196,7 @@
       notice2: "小心甜蜜詐騙以確保帳戶資金安全",
       bal: 13140,
       lastSpinDate: "",
+      spinCountToday: 0,
       rewards: [
         { name: "指定大餐一頓$1000", cost: 1500 },
         { name: "無條件券限兌換一次", cost: 3000 },
@@ -211,11 +212,13 @@
     };
 
     try {
-      var local = localStorage.getItem("yijun_bank_final_v11");
+      var local = localStorage.getItem("yijun_bank_final_v12");
       if (local) {
         var parsed = JSON.parse(local);
         dbData = Object.assign({}, dbData, parsed);
+        if (!Array.isArray(dbData.history)) dbData.history = [];
         if (!Array.isArray(dbData.dailyJournal)) dbData.dailyJournal = [];
+        if (typeof dbData.spinCountToday !== "number") dbData.spinCountToday = 0;
       }
     } catch (e) {}
 
@@ -227,6 +230,26 @@
     function getNowTime() {
       var d = new Date();
       return String(d.getHours()).padStart(2, '0') + ":" + String(d.getMinutes()).padStart(2, '0');
+    }
+
+    // 依明細總和重新計算正確餘額
+    function recalculateBalanceFromHistory() {
+      var total = 0;
+      dbData.history.forEach(function(item) {
+        var val = Number(item.amt);
+        if (!isNaN(val)) total += val;
+      });
+      dbData.bal = total;
+      return total;
+    }
+
+    // 同步當日抽獎次數（跨日自動歸零）
+    function syncSpinCountForToday() {
+      var today = getToday();
+      if (dbData.lastSpinDate !== today) {
+        dbData.spinCountToday = 0;
+      }
+      return dbData.spinCountToday;
     }
 
     // 每日餘額與明細自動記錄簿：每次登入或異動都自動同步當日快照
@@ -270,7 +293,7 @@
     function persist(reasonText) {
       recordDailySnapshot(reasonText);
       try {
-        localStorage.setItem("yijun_bank_final_v11", JSON.stringify(dbData));
+        localStorage.setItem("yijun_bank_final_v12", JSON.stringify(dbData));
       } catch (e) {}
     }
 
@@ -295,21 +318,23 @@
     }
 
     function render() {
+      var spinCount = syncSpinCountForToday();
+      var spun = (dbData.lastSpinDate === getToday() && spinCount >= 1);
+
       document.getElementById("uiTitle").innerText = dbData.title;
       document.getElementById("uiNoticeTitle").innerText = dbData.notice1;
       document.getElementById("uiNoticeSub").innerText = dbData.notice2;
       document.getElementById("uiBal").innerText = Number(dbData.bal).toLocaleString();
       document.getElementById("uiSub1").innerText = Number(dbData.bal).toLocaleString();
 
-      var spun = (dbData.lastSpinDate === getToday());
       var bSpin = document.getElementById("btnSpin");
       if (bSpin) {
-        bSpin.disabled = spun;
-        bSpin.innerText = spun ? "今日已完成抽獎" : "立即抽獎拿紅包";
+        bSpin.disabled = spun || isSpinning;
+        bSpin.innerText = isSpinning ? "轉盤旋轉中..." : (spun ? "今日已完成抽獎" : "立即抽獎拿紅包");
       }
       var sTxt = document.getElementById("spinStatusText");
       if (sTxt) {
-        sTxt.innerText = spun ? "今天已經抽過獎囉，明天再來！" : "今日免費抽獎機會：1 次";
+        sTxt.innerText = spun ? "今日已抽獎 " + spinCount + " 次（明天再來，或由管理員歸零次數）" : "今日已抽獎 " + spinCount + " 次（可抽獎 1 次）";
       }
 
       var rGrid = document.getElementById("uiRewards");
@@ -328,8 +353,8 @@
         btn.innerText = ok ? "立即兌換" : "餘額不足";
         btn.onclick = function() {
           if (!confirm("確定花費新台幣 " + r.cost + " 元兌換「" + r.name + "」？")) return;
-          dbData.bal = Number(dbData.bal) - Number(r.cost);
           dbData.history.unshift({ desc: "兌換獎勵：" + r.name, amt: -Number(r.cost), date: getToday() });
+          recalculateBalanceFromHistory();
           persist("兌換獎勵：" + r.name);
           render();
           alert("兌換成功！請截圖向管理員領取。");
@@ -380,8 +405,10 @@
           dBtn.style.cssText = "margin-left:8px; background:#ffece8; color:#cb2634; border:none; padding:4px 8px; border-radius:6px; font-size:11px; cursor:pointer;";
           dBtn.innerText = "刪";
           dBtn.onclick = function() {
+            var removedDesc = h.desc;
             dbData.history.splice(j, 1);
-            persist("管理員刪除明細");
+            recalculateBalanceFromHistory();
+            persist("刪除明細：" + removedDesc);
             render();
           };
           right.appendChild(dBtn);
@@ -390,7 +417,6 @@
         hBox.appendChild(row);
       });
 
-      // 渲染每日餘額與明細自動記錄簿
       var jBox = document.getElementById("uiDailyJournal");
       if (jBox) {
         jBox.innerHTML = "";
@@ -450,7 +476,8 @@
           return;
         }
 
-        // 每次登入都自動記錄當日餘額與明細
+        syncSpinCountForToday();
+        recalculateBalanceFromHistory();
         persist("登入自動記錄 (" + curUser.toUpperCase() + ")");
         document.getElementById("viewLogin").style.display = "none";
         document.getElementById("viewMain").style.display = "block";
@@ -479,7 +506,8 @@
       document.getElementById("qSupport").onclick = showSupport;
 
       document.getElementById("btnSpin").onclick = function() {
-        if (isSpinning || dbData.lastSpinDate === getToday()) return;
+        var spinCount = syncSpinCountForToday();
+        if (isSpinning || (dbData.lastSpinDate === getToday() && spinCount >= 1)) return;
         isSpinning = true;
         var btn = document.getElementById("btnSpin");
         btn.disabled = true;
@@ -492,9 +520,77 @@
         setTimeout(function() {
           isSpinning = false;
           dbData.lastSpinDate = getToday();
-          dbData.bal = Number(dbData.bal) + prize;
+          dbData.spinCountToday = Number(dbData.spinCountToday || 0) + 1;
           dbData.history.unshift({ desc: "每日幸運大抽獎獎金", amt: prize, date: getToday() });
+          recalculateBalanceFromHistory();
           persist("每日抽獎 +" + prize + " 元");
           render();
           alert("🎉 恭喜抽中每日紅包：新台幣 " + prize + " 元！\n已自動存入您的帳戶餘額與每日記錄簿。");
-        },
+        }, 3100);
+      };
+
+      document.getElementById("addTxBtn").onclick = function() {
+        var desc = document.getElementById("aDesc").value.trim();
+        var amt = Number(document.getElementById("aAmt").value);
+        if (!desc || isNaN(amt) || amt === 0) return;
+        dbData.history.unshift({ desc: desc, amt: amt, date: getToday() });
+        recalculateBalanceFromHistory();
+        document.getElementById("aDesc").value = "";
+        document.getElementById("aAmt").value = "";
+        persist("新增明細：" + desc);
+        render();
+        alert("已新增明細並自動更新正確餘額！");
+      };
+
+      document.getElementById("addRewardBtn").onclick = function() {
+        var name = document.getElementById("aRName").value.trim();
+        var cost = Number(document.getElementById("aRCost").value);
+        if (!name || isNaN(cost) || cost <= 0) return;
+        dbData.rewards.push({ name: name, cost: cost });
+        document.getElementById("aRName").value = "";
+        document.getElementById("aRCost").value = "";
+        persist("新增獎勵：" + name);
+        render();
+        alert("已上架新獎勵！");
+      };
+
+      document.getElementById("saveRewardsBtn").onclick = function() {
+        var up = [];
+        for (var k = 0; k < dbData.rewards.length; k++) {
+          var n = document.getElementById("eName_" + k).value.trim();
+          var c = Number(document.getElementById("eCost_" + k).value);
+          if (n && !isNaN(c) && c > 0) up.push({ name: n, cost: c });
+        }
+        dbData.rewards = up;
+        persist("修改獎勵列表");
+        render();
+        alert("獎勵名稱與金額已儲存！");
+      };
+
+      document.getElementById("saveSettingsBtn").onclick = function() {
+        dbData.title = document.getElementById("aTitle").value;
+        dbData.phone = document.getElementById("aPhone").value;
+        dbData.notice1 = document.getElementById("aNotice1").value;
+        dbData.notice2 = document.getElementById("aNotice2").value;
+        var manualBal = Number(document.getElementById("aNewBal").value);
+        if (!isNaN(manualBal) && manualBal !== Number(dbData.bal)) {
+          var diff = manualBal - Number(dbData.bal);
+          dbData.history.unshift({ desc: "管理員餘額調整", amt: diff, date: getToday() });
+          recalculateBalanceFromHistory();
+        }
+        persist("更新網銀設定與餘額");
+        render();
+        alert("修改已儲存！");
+      };
+
+      document.getElementById("resetSpinBtn").onclick = function() {
+        dbData.lastSpinDate = getToday();
+        dbData.spinCountToday = 0;
+        persist("歸零轉盤次數");
+        render();
+        alert("已將今日轉盤次數歸零！");
+      };
+    });
+  </script>
+</body>
+</html>
